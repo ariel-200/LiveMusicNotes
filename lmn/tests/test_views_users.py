@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.contrib import auth
 from django.contrib.auth import authenticate
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from lmn.models import Note
 
 
@@ -96,3 +96,26 @@ class TestUserAuthentication(TestCase):
         new_user = authenticate(username='sam12345', password='feRpj4w4pso3az@1!2')
         self.assertRedirects(response, reverse('user_profile', kwargs={"user_pk": new_user.pk}))   
         self.assertContains(response, 'sam12345')  # page has user's username on it
+
+
+class Logout(TestCase):
+
+    fixtures = ['testing_users']
+
+    def test_logout_link_logs_out(self):
+        logged_in_user = User.objects.get(pk=2)
+        self.client.force_login(logged_in_user) 
+
+        logout = reverse('logout')
+        response = self.client.post(logout)
+        logged_in_user = auth.get_user(self.client)
+        self.assertIsInstance(logged_in_user, AnonymousUser)
+
+
+    def test_logout_redirects_home(self):
+        logged_in_user = User.objects.get(pk=2)
+        self.client.force_login(logged_in_user) 
+
+        logout = reverse('logout')
+        response = self.client.post(logout, follow=True)
+        self.assertTemplateUsed('home.html')

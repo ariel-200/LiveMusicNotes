@@ -1,3 +1,7 @@
+:root {
+  --link-color: #18eef5;
+}
+
 body {
   font-family: monospace;
   background: #282e2e;
@@ -5,7 +9,7 @@ body {
 }
 
 a {
-  color: #18eef5;
+  color: var(--link-color)
 }
 
 #add-new-show-link {
@@ -24,4 +28,24 @@ a {
   border-radius: 5px;
   padding: 2px;
   margin: 2px;
+}
+
+#logout-button {
+  /* thanks copilot */
+  display: inline; /* Makes it behave like text within the flow */
+  padding: 0; /* Removes default button padding */
+  border: none; /* Removes default button border */
+  font: inherit; /* Inherits font styles from parent element */
+  text-decoration: underline; /* Adds the classic link underline */
+  cursor: pointer; /* Changes cursor to a pointer on hover, like a link */
+  background: transparent; /* Removes default button background */
+  color: currentColor; /* Inherits text color from parent element */
+  -webkit-appearance: none; /* Removes default browser button styling for Webkit browsers */
+  -moz-appearance: none; /* Removes default browser button styling for Mozilla browsers */
+  appearance: none; /* Removes default browser button styling */
+}
+
+#logout-form {
+  display: inline; 
+  color: var(--link-color)
 }

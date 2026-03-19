@@ -15,8 +15,8 @@
 
     <div>
       {% if search_term %}
-        <h3 id="venue-list-title">Venues matching '{{ search_term }}'  
-          <a href="{% url 'venue_list' %}" id='clear_search'>clear</a>
+        <h3 id="venue-list-title">Venues matching '{{ search_term }}'
+          <a href="{% url 'venue_list' %}" id="clear_search">clear</a>
         </h3>
       {% else %}
         <h3 id="venue-list-title">All venues</h3>
@@ -24,7 +24,6 @@
     </div>
 
     <div>
-
       {% for venue in venues %}
         <div id="venue-{{ venue.pk }}">
           <p><a href="{% url 'venue_detail' venue_pk=venue.pk %}">{{ venue.name }}</a> {{ venue.city }}, {{ venue.state }}</p>
@@ -33,7 +32,6 @@
       {% empty %}
         <p>No venues found</p>
       {% endfor %}
-
     </div>
   </div>
 

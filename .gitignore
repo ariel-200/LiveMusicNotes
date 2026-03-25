@@ -11,3 +11,6 @@ __pycache__
 # ignore virtual enviroments 
 venv
 env
+
+# ignore image uploads
+.media/

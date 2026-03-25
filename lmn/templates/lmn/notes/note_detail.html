@@ -8,5 +8,8 @@
 
   <p id="note-title"><b>{{ note.title}}</b></p>
   <p id="note-text">{{ note.text }}</p>
+  {% if note.image %}
+  <img id="show-image" src="{{ note.image.url }}">
+  {% endif %}
 
 {% endblock %}

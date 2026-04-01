@@ -122,6 +122,6 @@ class Logout(TestCase):
 
     def test_logged_out_user_cannot_user_profile(self):
         """ verify that a user must be logged in to create new notes """
-        response = self.client.get(reverse('user_profile'))  # NOT A NEW TEMPLATE
+        response = self.client.get(reverse('user_profile', kwargs={'user_pk': 2}))
 
         self.assertNotContains(response, 'Edit')  # double-check 

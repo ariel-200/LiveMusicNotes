@@ -124,4 +124,4 @@ class Logout(TestCase):
         """ verify that a user must be logged in to create new notes """
         response = self.client.get(reverse('new_note'))
 
-        self.assertNotContains(response, 'add')  # figure out what elements are in the notes creation page
+        self.assertNotContains(response, 'Edit')  # double-check 

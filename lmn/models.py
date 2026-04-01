@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+
 
 # Remember that every model gets a primary key field by default.
 
@@ -37,11 +39,29 @@ class Show(models.Model):
     """ One Artist playing at one Venue at a particular date and time. """
 
     show_date = models.DateTimeField(blank=False)
+    end_date = models.DateField(blank=False)  # add an end date/time
+
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
 
+    # validation
+    def clean(self):
+        super().clean()
+
+        if self.show_date and self.end_date:  # check start and end exist
+            if self.end_date <= self.show_date:  # check end comes after start
+                raise ValidationError({
+                    'Error: End datetime cannot be earlier than start datetime!'
+                })
+            exists = Show.objects.filter(  # check overlaps
+                show_date__lt=self.end_date,
+                end_date__gt=self.show_date
+            ).exclude(pk=self.pk).exists()
+            if exists:
+                raise ValidationError('Error: Time slot overlaps!')
+
     def __str__(self):
-        return f'Artist: {self.artist} At: {self.venue} On: {self.show_date}'
+        return f'Artist: {self.artist} At: {self.venue} From: {self.show_date} To: {self.end_date}'
 
 
 class Note(models.Model):

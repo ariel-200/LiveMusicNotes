@@ -15,7 +15,7 @@
 
   <div>
     {% if search_term %}
-      <h3 id="artist-list-title">Artists matching '{{ search_term }}' 
+      <h3 id="artist-list-title">Artists matching '{{ search_term }}'
         <a href="{% url 'artist_list' %}" id="clear_search">(clear)</a>
       </h3>
     {% else %}
@@ -25,20 +25,20 @@
 
   <div>
   {% for artist in artists %}
-  
+
     <div class="artist" id="artist_{{ artist.pk }}">
       <p>
         <a href="{% url 'artist_detail' artist_pk=artist.pk %}">{{ artist.name }}</a>
       </p>
-      
-      <p>See venues played, notes, and add your own 
+
+      <p>See venues played, notes, and add your own
         <a href="{% url 'venues_for_artist' artist_pk=artist.pk %}">{{ artist.name }} notes</a>
       </p>
     </div>
   </div>
 
   {% empty %}
-    
+
     <p>No artists found</p>
 
   {% endfor %}

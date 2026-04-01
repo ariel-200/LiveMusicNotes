@@ -119,3 +119,6 @@ class Logout(TestCase):
         logout = reverse('logout')
         response = self.client.post(logout, follow=True)
         self.assertTemplateUsed('home.html')
+
+    #def test_logout_non_acess(self):
+    #    

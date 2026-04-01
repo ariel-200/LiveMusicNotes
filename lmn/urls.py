@@ -4,7 +4,7 @@ from django.contrib import messages
 
 from .views import views_main, views_artists, views_venues, views_notes, views_users
 
-class MyLogoutView(auth_views.LogoutView):
+class ConfirmLogoutView(auth_views.LogoutView):
     def dispatch(self, request, *args, **kwargs):
         messages.info(request, "You are logged out")
         return super().dispatch(request, *args, **kwargs)
@@ -35,7 +35,7 @@ urlpatterns = [
 
     # Account related URLs
     path('accounts/login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
-    path('accounts/logout/', MyLogoutView.as_view(template_name='lmn/home.html'), name='logout'),
+    path('accounts/logout/', ConfirmLogoutView.as_view(template_name='lmn/home.html'), name='logout'),
     path('register/', views_users.register, name='register'),
 
 ]

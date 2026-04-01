@@ -6,7 +6,6 @@ from .views import views_main, views_artists, views_venues, views_notes, views_u
 
 class ConfirmLogoutView(auth_views.LogoutView):
     def dispatch(self, request, *args, **kwargs):
-        messages.info(request, "You are logged out")
         return super().dispatch(request, *args, **kwargs)
 
 urlpatterns = [

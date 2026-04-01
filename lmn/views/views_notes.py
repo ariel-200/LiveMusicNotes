@@ -16,7 +16,8 @@ def new_note(request, show_pk):
 
     #Prevent creating notes for future shows
     if show.show_date > timezone.now():
-        return HttpResponseForbidden()
+        return HttpResponseForbidden('You cannot add notes for future shows. ')
+
 
     if request.method == 'POST':
         form = NewNoteForm(request.POST)

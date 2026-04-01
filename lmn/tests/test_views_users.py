@@ -120,8 +120,8 @@ class Logout(TestCase):
         response = self.client.post(logout, follow=True)
         self.assertTemplateUsed('home.html')
 
-    def test_logged_out_user_cannot_add_note(self):
+    def test_logged_out_user_cannot_user_profile(self):
         """ verify that a user must be logged in to create new notes """
-        response = self.client.get(reverse('new_note'))
+        response = self.client.get(reverse('user_profile'))  # NOT A NEW TEMPLATE
 
         self.assertNotContains(response, 'Edit')  # double-check 

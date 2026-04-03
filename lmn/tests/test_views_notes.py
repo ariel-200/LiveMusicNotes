@@ -141,4 +141,3 @@ class TestNotes(TestCase):
 
 class TestEditNotesWhenUserLoggedIn(TestCase):
     # TODO - create test to check condition when user edits their own notes.
-

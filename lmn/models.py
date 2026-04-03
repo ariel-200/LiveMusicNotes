@@ -44,6 +44,8 @@ class Show(models.Model):
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
 
+    # needs db side constraints
+
     # validation
     def clean(self):
         super().clean()

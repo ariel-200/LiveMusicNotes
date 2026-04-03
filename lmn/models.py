@@ -48,18 +48,27 @@ class Show(models.Model):
     def clean(self):
         super().clean()
 
-        # check end datetime is after start datetime
-        if self.end_date <= self.show_date:
-            raise ValidationError({'end_date': 'Error: End datetime cannot be earlier than start datetime!'})  # will raise error in input box
+        # check that start and end datetimes exist
+        if self.show_date and self.end_date:
 
-        overlap = Show.objects.filter(
-            show_date__lt=self.end_date,
-            end_date__gt=self.show_date,
-            venue=self.venue
-        ).exclude(pk=self.pk).exists()
+            # check correct start and end
+            if self.end_date <= self.show_date:
+                raise ValidationError({'end_date': 'Error: End datetime cannot be earlier than start datetime!'})  # will raise error in input box
 
-        if overlap:
-            raise ValidationError('Error: Time slot overlaps!')
+            # check overlaps
+            overlap = Show.objects.filter(
+                show_date__lt=self.end_date,
+                end_date__gt=self.show_date,
+                venue=self.venue
+            ).exclude(pk=self.pk).exists()
+
+            if overlap:
+                raise ValidationError('Error: Time/venue slot overlaps with existing show!')
+
+        if not self.show_date:
+            raise ValidationError({'show_date': 'Error: Invalid start datetime!'})
+        if not self.end_date:
+            raise ValidationError({'end_date': 'Error: Invalid end datetime!'})
 
     def __str__(self):
         return f'Artist: {self.artist} At: {self.venue} From: {self.show_date} To: {self.end_date}'

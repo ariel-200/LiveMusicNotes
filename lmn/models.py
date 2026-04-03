@@ -39,7 +39,7 @@ class Show(models.Model):
     """ One Artist playing at one Venue at a particular date and time. """
 
     show_date = models.DateTimeField(blank=False)
-    end_date = models.DateField(blank=False)  # add an end date/time
+    end_date = models.DateTimeField(blank=False)  # add an end date/time
 
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE)

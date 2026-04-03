@@ -44,23 +44,22 @@ class Show(models.Model):
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
 
-    # needs db side constraints
-
     # validation
     def clean(self):
         super().clean()
 
-        if self.show_date and self.end_date:  # check start and end exist
-            if self.end_date <= self.show_date:  # check end comes after start
-                raise ValidationError({
-                    'Error: End datetime cannot be earlier than start datetime!'
-                })
-            exists = Show.objects.filter(  # check overlaps
-                show_date__lt=self.end_date,
-                end_date__gt=self.show_date
-            ).exclude(pk=self.pk).exists()
-            if exists:
-                raise ValidationError('Error: Time slot overlaps!')
+        # check end datetime is after start datetime
+        if self.end_date <= self.show_date:
+            raise ValidationError({'end_date': 'Error: End datetime cannot be earlier than start datetime!'})  # will raise error in input box
+
+        overlap = Show.objects.filter(
+            show_date__lt=self.end_date,
+            end_date__gt=self.show_date,
+            venue=self.venue
+        ).exclude(pk=self.pk).exists()
+
+        if overlap:
+            raise ValidationError('Error: Time slot overlaps!')
 
     def __str__(self):
         return f'Artist: {self.artist} At: {self.venue} From: {self.show_date} To: {self.end_date}'

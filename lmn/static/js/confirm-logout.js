@@ -8,3 +8,17 @@ logoutButtons.forEach(function(button){
         }
     })
 })
+
+// store logout in session
+document.addEventListener('DOMContentLoaded', () => {
+    if (sessionStorage.getItem('loggedOut') === 'true') {
+        alert("You have logged out!");
+        sessionStorage.removeItem('loggedOut');
+    }
+    const logoutForm = document.getElementById('logout-form');
+    if (logoutForm) {
+        logoutForm.addEventListener('submit', () => {
+            sessionStorage.setItem('loggedOut', 'true');
+        });
+    }
+});

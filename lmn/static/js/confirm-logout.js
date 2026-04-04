@@ -6,6 +6,5 @@ logoutButtons.forEach(function(button){
         if (!okToLogout) {
             ev.preventDefault();
         }
-        alert("You are logged out!")
     })
 })

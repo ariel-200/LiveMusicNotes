@@ -75,6 +75,10 @@ coverage report
 
 ### Linting
 
+Linters are used to check for code style. 
+
+#### Python Linter 
+
 The app uses Flake8 to lint code files. This checks for some (but not all) code quality issues.
 
 ```
@@ -83,7 +87,21 @@ flake8 .
 
 Configure linting rules if desired in the .flake8 file. You may want to list your virtual environment directory if it has a name other than venv, otherwise Flake8 will lint the library files and that isn't necessary. 
 
-A tool called JinjaLint is installed when GitHub actions runs your tests. You may also install this locally, but it's somewhat common to see issues when trying to run it. 
+#### Template Linter 
+
+djlint is used to lint HTML template files. This checks for style and syntax in your templates. 
+
+Run djlint with this command on Macs/Linux
+
+```
+djlint lmn/templates
+```
+
+And for Windows,
+
+```
+djlint lmn\templates
+```
 
 ### Databases
 

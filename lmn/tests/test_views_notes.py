@@ -9,6 +9,8 @@ from datetime import timedelta
 
 import datetime
 
+from lmn.models import  Show
+
 
 class TestNoNotesViews(TestCase):
 
@@ -147,7 +149,7 @@ class TestFutureShowRestriction(TestCase):
     def setUp(self):
         self.client.force_login(User.objects.first())
 
-        from lmn.models import  Show
+
         self.future_show = Show.objects.create(
             artist_id=1,venue_id=1, show_date=timezone.now() +timedelta(days=5))
 

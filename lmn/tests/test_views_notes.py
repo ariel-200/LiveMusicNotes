@@ -157,4 +157,10 @@ class TestFutureShowRestriction(TestCase):
             response= self.client.post(reverse('new_note', kwargs={'show_pk':self.future_show.pk}),{'title':'t','text':'t'})
             self.assertEqual(response.status_code,403)
 
+    def test_future_show_get_blocked(self):
+                response = self.client.get(
+                    reverse('new_note', kwargs={'show_pk': self.future_show.pk})
+                )
+                self.assertEqual(response.status_code,403)
+
 

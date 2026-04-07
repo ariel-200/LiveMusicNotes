@@ -71,6 +71,7 @@ class TestShow(TestCase):
 
             if not allowed:
                 with self.assertRaises(ValidationError):
+                    show2.full_clean()  # need to call bc model validation
                     show2.save()
             elif allowed:
                 show2.save()

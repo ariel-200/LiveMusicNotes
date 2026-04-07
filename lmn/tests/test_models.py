@@ -1,9 +1,7 @@
 from django.test import TestCase
-from django.contrib.auth.models import User
-from django.contrib.auth.models import Show
-from django.db import IntegrityError
-
-import datetime
+from django.contrib.auth.models import User, Artist, Venue, Show
+from django.db import IntegrityError, ValidationError
+from datetime import datetime
 
 class TestUser(TestCase):
 
@@ -25,27 +23,53 @@ class TestUser(TestCase):
 
 class TestShow(TestCase):
     # evaluate show creation conflicts
-
-    def test_create_same_artist_same_venue_same_time_fails():
-        pass
     
-    def test_create_different_artist_same_venue_same_time_fails():
-        pass
-    
-    def test_create_different_artist_different_venue_same_time():
-        pass
+    def setUp(self):  # django jargon
+        self.artist1 = Artist(name='Jichael Mackson')
+        self.artist2 = Artist(name='Saylor Twift')
+        
+        self.venue1 = Venue(name='First Venue', city='Minneapolis', state='MN'),
+        self.venue2 = Venue(name='Second Venue', city='Sacramento', state='CA')
 
-    def test_create_different_artist_same_venue_different_time():
-        pass
+    def test_back_to_back_shows_allowed(self):
+        show1 = Show(artist=self.artist1, venue=self.venue1, show_date=datetime(2025, 1, 1, 8, 0), end_date=datetime(2025, 1, 1, 9, 0))
+        show1.save()
 
-    def test_create_same_artist_different_venue_same_time_fails():
-        pass
+        show2 = Show(artist=self.artist2, venue=self.venue1, show_date=datetime(2025, 1, 1, 9, 0), end_date=datetime(2025, 1, 1, 10, 0))
+        show2.save()  # if error is raised here, test fails
 
-    def test_create_same_artist_different_venue_different_time():
-        pass
+    def test_scheduling_conflicts(self):
+        # test every possible artist, venue, time combinations
 
-    def test_create_same_artist_same_venue_different_time():
-        pass
+        start_time1 = datetime(2025, 1, 1, 8, 0)
+        end_time1 = datetime(2025, 1, 1, 9, 0)
 
-    def test_create_different_artist_different_venue_different_time():
-        pass
+        start_time2 = datetime(2026, 1, 1, 8, 0)
+        end_time2 = datetime(2026, 1, 1, 9, 0)
+
+        # control
+        show1 = Show(artist=self.artist1, venue=self.venue1, show_date=start_time1, end_date=end_time1)
+        show1.save()
+
+        combinations = [
+
+            # artist       venue        start        end        allowed
+            (self.artist1, self.venue1, start_time1, end_time1, False),  # same artist, same venue, same time
+            (self.artist2, self.venue2, start_time2, end_time2, True),   # diff artist, diff venue, diff time
+
+            (self.artist1, self.venue2, start_time1, end_time1, True),   # same artist, diff venue, same time
+            (self.artist1, self.venue1, start_time2, end_time2, True),   # same artist, same venue, diff time
+            (self.artist2, self.venue1, start_time1, end_time1, False),  # diff artist, same venue, same time
+            (self.artist2, self.venue2, start_time1, end_time1, True),   # diff artist, diff venue, same time
+            (self.artist2, self.venue1, start_time2, end_time2, True),   # diff artist, same venue, diff time
+        ]
+
+        for artist, venue, start, end, allowed in combinations:
+            show2 = Show(artist=artist, venue=venue, show_date=start, end_date=end)
+
+            if not allowed:
+                with self.assertRaises(ValidationError):
+                    show2.save()
+            elif allowed:
+                show2.save()
+                show2.delete()  # so that next loop does not conflict with this one

@@ -1,6 +1,8 @@
 from django.test import TestCase
-from django.contrib.auth.models import User, Artist, Venue, Show
-from django.db import IntegrityError, ValidationError
+from django.contrib.auth.models import User
+from lmn.models import Artist, Venue, Show
+from django.db import IntegrityError
+from django.core.exceptions import ValidationError
 from datetime import datetime
 
 class TestUser(TestCase):
@@ -25,11 +27,11 @@ class TestShow(TestCase):
     # evaluate show creation conflicts
     
     def setUp(self):  # django jargon
-        self.artist1 = Artist(name='Jichael Mackson')
-        self.artist2 = Artist(name='Saylor Twift')
+        self.artist1 = Artist.objects.create(name='Jichael Mackson')
+        self.artist2 = Artist.objects.create(name='Saylor Twift')
         
-        self.venue1 = Venue(name='First Venue', city='Minneapolis', state='MN'),
-        self.venue2 = Venue(name='Second Venue', city='Sacramento', state='CA')
+        self.venue1 = Venue.objects.create(name='First Venue', city='Minneapolis', state='MN')
+        self.venue2 = Venue.objects.create(name='Second Venue', city='Sacramento', state='CA')
 
     def test_back_to_back_shows_allowed(self):
         show1 = Show(artist=self.artist1, venue=self.venue1, show_date=datetime(2025, 1, 1, 8, 0), end_date=datetime(2025, 1, 1, 9, 0))

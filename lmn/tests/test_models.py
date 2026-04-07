@@ -1,7 +1,9 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
+from django.contrib.auth.models import Show
 from django.db import IntegrityError
 
+import datetime
 
 class TestUser(TestCase):
 
@@ -22,30 +24,28 @@ class TestUser(TestCase):
             user2.save()
 
 class TestShow(TestCase):
+    # evaluate show creation conflicts
 
-    def test_create_show_same_venue_same_time_fails(self):
-        # make sure that creating 2 different shows at the same time at the same venue location fails
-        # validation error
+    def test_create_same_artist_same_venue_same_time_fails():
+        pass
+    
+    def test_create_different_artist_same_venue_same_time_fails():
+        pass
+    
+    def test_create_different_artist_different_venue_same_time():
         pass
 
-    def test_create_show_same_venue_overlap_time_fails(self):
-        # make sure that creating 2 different shows at the overlapping times at the same venue location fails
-        # validation error
-
-        pass
-    def test_create_show_different_venue_same_time_same_artist_fails(self):
-        # make sure that creating 2 different shows with the same artist performing at the same time at different venues is not possible
-        # validation error
+    def test_create_different_artist_same_venue_different_time():
         pass
 
-    def test_create_second_show_starting_at_the_end_of_first(self):
-        # should be able to create shows that start at the exact end time of a previous show at the same venue
+    def test_create_same_artist_different_venue_same_time_fails():
         pass
 
-    def test_create_show_different_venue_same_time(self):
-        # should be able to create a show that is at the same time but different venue locations
+    def test_create_same_artist_different_venue_different_time():
         pass
 
-    def test_create_show_different_venue_overlapping_time(self):
-        # should be able to create a show that is at overlapping times with a different show but different venue locations
+    def test_create_same_artist_same_venue_different_time():
+        pass
+
+    def test_create_different_artist_different_venue_different_time():
         pass

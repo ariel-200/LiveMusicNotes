@@ -67,12 +67,13 @@ class TestShow(TestCase):
         ]
 
         for artist, venue, start, end, allowed in combinations:
-            show2 = Show(artist=artist, venue=venue, show_date=start, end_date=end)
+            with self.subTest(artist=artist, venue=venue, allowed=allowed):
+                show2 = Show(artist=artist, venue=venue, show_date=start, end_date=end)
 
-            if not allowed:
-                with self.assertRaises(ValidationError):
-                    show2.full_clean()  # need to call bc model validation
+                if not allowed:
+                    with self.assertRaises(ValidationError):
+                        show2.full_clean()  # need to call bc model validation
+                        show2.save()
+                elif allowed:
                     show2.save()
-            elif allowed:
-                show2.save()
-                show2.delete()  # so that next loop does not conflict with this one
+                    show2.delete()  # so that next loop does not conflict with this one

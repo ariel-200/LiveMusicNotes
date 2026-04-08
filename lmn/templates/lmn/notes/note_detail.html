@@ -13,6 +13,7 @@
   {% endif %}
 
   {% if user == note.user %}
+    <br>
     <a href="{% url 'edit_note' note_pk=note.pk %}">Edit</a>
   {% endif %}
 

@@ -4,6 +4,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 
+import os
+from django.conf import settings
+
 from ..models import Note, Show
 from ..forms import NewNoteForm 
 
@@ -52,9 +55,17 @@ def edit_note(request, note_pk):
     if request.user != note.user:
         return HttpResponseForbidden()
     if request.method == 'POST':
-        form = NewNoteForm(request.POST, instance=note)
+        form = NewNoteForm(request.POST, request.FILES, instance=note)
         if form.is_valid():
+            """ Image handling allows for adding image or editing existing image.
+                Old images are removed from the directory. """
+            old_image = Note.objects.get(pk=note.pk).image
             form.save()
+            new_image = note.image
+
+            if old_image and old_image != new_image:
+                old_image.delete(save=False)
+
             return redirect('note_detail', note_pk=note.pk)
     else:
         form = NewNoteForm(instance=note)

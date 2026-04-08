@@ -56,3 +56,8 @@ class Note(models.Model):
     def __str__(self):
         return f'User: {self.user} Show: {self.show} Note title: {self.title} \
         Text: {self.text} Posted on: {self.posted_date}'
+
+    class Meta:
+        constraints =[
+            models.UniqueConstraint(fields=['user', 'show'], name='unique_user_show_note')
+        ]

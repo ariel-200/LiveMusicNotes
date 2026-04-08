@@ -1,5 +1,5 @@
 """ Views related to creating and viewing Notes for shows. """
-
+from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 
@@ -11,6 +11,11 @@ from ..forms import NewNoteForm
 def new_note(request, show_pk):
     """ Create a new note for a show. """
     show = get_object_or_404(Show, pk=show_pk)
+
+    existing_note= Note.objects.filter(user=request.user, show=show).first()
+
+    if existing_note:
+        return HttpResponseForbidden('you have already added a note for this show.')
 
     if request.method == 'POST':
         form = NewNoteForm(request.POST)

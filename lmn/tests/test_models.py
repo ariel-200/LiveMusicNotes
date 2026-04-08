@@ -40,6 +40,15 @@ class TestShow(TestCase):
         show2 = Show(artist=self.artist2, venue=self.venue1, show_date=datetime(2025, 1, 1, 9, 0), end_date=datetime(2025, 1, 1, 10, 0))
         show2.save()  # if error is raised here, test fails
 
+    def test_time_overlap_fails(self):
+        show1 = Show(artist=self.artist1, venue=self.venue1, show_date=datetime(2025, 1, 1, 8, 0), end_date=datetime(2025, 1, 1, 9, 0))
+        show1.save()
+
+        show2 = Show(artist=self.artist2, venue=self.venue1, show_date=datetime(2025, 1, 1, 8, 30), end_date=datetime(2025, 1, 1, 9, 30))
+        with self.assertRaises(ValidationError):
+            show2.full_clean()
+            show2.save()
+
     def test_scheduling_conflicts(self):
         # test every possible artist, venue, time combinations
 

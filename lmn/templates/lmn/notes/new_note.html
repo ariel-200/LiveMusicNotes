@@ -4,7 +4,7 @@
 
   <h2>New note for {{ show.artist.name }} at {{ show.venue.name }} on {{ show.show_date}}</h2>
 
-  <form method="POST" action="{% url 'new_note' show_pk=show.pk %}">
+  <form method="POST" action="{% url 'new_note' show_pk=show.pk %}" enctype="multipart/form-data">
     
     <div>
       {% csrf_token %}

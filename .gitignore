@@ -13,4 +13,4 @@ venv
 env
 
 # ignore image uploads
-.media/
+media/

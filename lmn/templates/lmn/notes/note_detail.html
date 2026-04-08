@@ -9,4 +9,8 @@
   <p id="note-title"><b>{{ note.title}}</b></p>
   <p id="note-text">{{ note.text }}</p>
 
+  {% if user == note.user %}
+    <a href="{% url 'edit_note' note_pk=note.pk %}">Edit</a>
+  {% endif %}
+
 {% endblock %}

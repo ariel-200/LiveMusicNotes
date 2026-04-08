@@ -15,7 +15,7 @@ def new_note(request, show_pk):
     existing_note= Note.objects.filter(user=request.user, show=show).first()
 
     if existing_note:
-        return HttpResponseForbidden('you have already added a note for this show.')
+        return HttpResponseForbidden('You have already added a note for this show.')
 
     if request.method == 'POST':
         form = NewNoteForm(request.POST)
@@ -41,7 +41,12 @@ def notes_for_show(request, show_pk):
     """ Get notes for one show, most recent first. """
     show = get_object_or_404(Show, pk=show_pk)  
     notes = Note.objects.filter(show=show_pk).order_by('-posted_date')
-    return render(request, 'lmn/notes/notes_for_show.html', {'show': show, 'notes': notes})
+
+    user_note = None
+    if request.user.is_authenticated:
+        user_note = Note.objects.filter(user=request.user, show=show).first()
+
+    return render(request, 'lmn/notes/notes_for_show.html', {'show': show, 'notes': notes, 'user_note':user_note})
 
 
 def note_detail(request, note_pk):

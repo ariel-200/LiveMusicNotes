@@ -46,7 +46,7 @@ h3 {
     margin-bottom: 15px;
 
     margin-left: calc((100% - 1000px) / 2 + 5px);
-    /* lines it up with your centered content */
+    /* lines it up with centered content */
 }
 
 #add-new-show-link:hover {
@@ -182,5 +182,9 @@ input[type="submit"] {
 }
 
 .note-image {
-    width: 50%;
+    display: block;
+    width:50%;
+    height: auto;
+    margin-left: calc((100% - 1040px) / 2 + 5px);
+    /* lines it up with centered content */
 }

@@ -1,8 +1,12 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
+from django.contrib import messages
 
 from .views import views_main, views_artists, views_venues, views_notes, views_users
 
+class ConfirmLogoutView(auth_views.LogoutView):
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
 urlpatterns = [
 
@@ -30,7 +34,7 @@ urlpatterns = [
 
     # Account related URLs
     path('accounts/login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
-    path('accounts/logout/', auth_views.LogoutView.as_view(template_name='lmn/home.html'), name='logout'),
+    path('accounts/logout/', ConfirmLogoutView.as_view(template_name='lmn/home.html'), name='logout'),
     path('register/', views_users.register, name='register'),
 
 ]

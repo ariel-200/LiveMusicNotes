@@ -14,7 +14,10 @@ def user_profile(request, user_pk):
     """
     user = User.objects.get(pk=user_pk)
     usernotes = Note.objects.filter(user=user.pk).order_by('-posted_date')
-    return render(request, 'lmn/users/user_profile.html', {'user_profile': user, 'notes': usernotes})
+
+    # Get profile if it exists
+    profile = Profile.objects.filter(user=user).first()
+    return render(request, 'lmn/users/user_profile.html', {'user_profile': user, 'notes': usernotes, 'profile': profile})
 
 
 @login_required

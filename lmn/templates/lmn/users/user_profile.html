@@ -12,7 +12,39 @@
 
   -->
 
-  <h2 id="username-notes">{{ user_profile.username }}'s notes</h2>
+  <h2 id="username-profile">{{ user_profile.username }}'s profile</h2>
+
+    {% if user.is_authenticated and user.pk == user_profile.pk %}
+        <a href="{% url 'edit_profile' %}" id="edit-profile-link">Edit Profile</a>
+    {% endif %}
+
+    {% if profile %}
+        <div class="profile-info">
+
+            {% if profile.bio %}
+                <p><strong>Bio:</strong> {{ profile.bio }}</p>
+            {% endif %}
+
+            {% if profile.favorite_artist %}
+                <p><strong>Favorite Artist:</strong> {{ profile.favorite_artist }}</p>
+            {% endif %}
+
+            {% if profile.favorite_genre %}
+                <p><strong>Favorite Genre:</strong> {{ profile.favorite_genre }}</p>
+            {% endif %}
+
+            {% if profile.favorite_show %}
+                <p>
+                    <strong>Favorite Show:</strong>
+                    {{ profile.favorite_show.artist.name }} at
+                    {{ profile.favorite_show.venue.name }} on
+                    {{ profile.favorite_show.show_date }}
+                </p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <h2 id="username-notes">Notes</h2>
 
   {% for note in notes %}
 

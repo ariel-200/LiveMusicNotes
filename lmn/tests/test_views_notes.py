@@ -151,8 +151,7 @@ class TestFutureShowRestriction(TestCase):
 
 
         self.future_show = Show.objects.create(
-            artist_id=1,venue_id=1, show_date=timezone.now() +timedelta(days=5))
-
+            artist_id=1,venue_id=1, show_date=timezone.now() +timedelta(days=5),end_date=timezone.now() + timedelta(days=5,hours=2))
     def test_future_show_blocked(self):
             response= self.client.post(reverse('new_note', kwargs={'show_pk':self.future_show.pk}),{'title':'t','text':'t'})
             self.assertEqual(response.status_code,403)

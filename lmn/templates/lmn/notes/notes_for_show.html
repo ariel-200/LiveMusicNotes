@@ -2,10 +2,10 @@
 
 {% block content %}
 
-  <h2 id="show-title">Notes for {{ show.artist.name }} at {{ show.venue.name }} on {{ show.show_date }}</h2>
+  <h2 id="show-title">Notes for {{ show.artist.name }} at {{ show.venue.name }} on {{ show.show_date }} - {{show.end_date}}</h2>
 
   {% if show.show_date <= now %}
-    <a href="{% url 'new_note' show_pk=show.pk %}">
+    <a id="add-new-show-link" href="{% url 'new_note' show_pk=show.pk %}">
       Add your own notes for this show
     </a>
   {% else %}

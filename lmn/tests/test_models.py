@@ -33,7 +33,7 @@ class TestNoteModel(TestCase):
         self.user = User.objects.create(username='testuser', email='test@example.com', first_name='Test', last_name='User')
 
     def test_cannot_create_note_for_future_show(self):
-        show = Show.objects.create(artist=self.artist, venue=self.venue, show_date=timezone.now() + timedelta(days=5))
+        show = Show.objects.create(artist=self.artist, venue=self.venue, show_date=timezone.now() + timedelta(days=5), end_date=timezone.now() + timedelta(days=5, hours=2))
         note = Note(show=show,user=self.user, title='test title', text='test text')
         with self.assertRaises(ValidationError):
             note.full_clean()

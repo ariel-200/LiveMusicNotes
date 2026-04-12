@@ -36,10 +36,10 @@ class TestUserProfile(TestCase):
     def test_username_shown_on_profile_page(self):
         # A string "username's notes" is visible
         response = self.client.get(reverse('user_profile', kwargs={'user_pk': 1}))
-        self.assertContains(response, 'alice\'s notes')
+        self.assertContains(response, 'alice\'s profile')
 
         response = self.client.get(reverse('user_profile', kwargs={'user_pk': 2}))
-        self.assertContains(response, 'bob\'s notes')
+        self.assertContains(response, 'bob\'s profile')
 
     def test_correct_user_name_shown_different_profiles(self):
         logged_in_user = User.objects.get(pk=2)

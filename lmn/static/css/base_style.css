@@ -188,3 +188,26 @@ input[type="submit"] {
     margin-left: calc((100% - 1040px) / 2 + 5px);
     /* lines it up with centered content */
 }
+
+/* Profile page styling */
+.profile-info {
+    margin-bottom: 30px;
+}
+
+.profile-info strong {
+    color: #1d4ed8; /* match site blue */
+}
+
+/* Make edit profile look like a button */
+#edit-profile-link {
+    display: inline-block;
+    background-color: #1d4ed8;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-bottom: 10px;
+    margin-left: calc((100% - 1000px) / 2 + 5px);
+    /* lines it up with centered content */
+}
+

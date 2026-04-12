@@ -85,6 +85,20 @@ class TestUserProfile(TestCase):
         self.assertEqual(profile.favorite_artist, 'Bob')
         self.assertEqual(profile.favorite_genre, 'Pop')
 
+    def test_edit_profile_link_only_on_own_profile(self):
+        """ Verify edit profile link only appears on user's own profile """
+
+        user = User.objects.get(pk=2)
+        self.client.force_login(user)
+
+        # Viewing own profile, should see Edit Profile
+        response = self.client.get(reverse('user_profile', kwargs={'user_pk': 2}))
+        self.assertContains(response, 'Edit Profile')
+
+        # Viewing another user's profile, should NOT see Edit Profile
+        response = self.client.get(reverse('user_profile', kwargs={'user_pk': 1}))
+        self.assertNotContains(response, 'Edit Profile')
+
 
 class TestUserAuthentication(TestCase):
     """ Some aspects of registration (e.g. missing data, duplicate username) covered in test_forms """

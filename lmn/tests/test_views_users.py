@@ -5,7 +5,7 @@ from django.contrib import auth
 from django.contrib.auth import authenticate
 
 from django.contrib.auth.models import User, AnonymousUser
-from lmn.models import Note
+from lmn.models import Note, Profile
 
 
 class TestUserProfile(TestCase):
@@ -53,6 +53,37 @@ class TestUserProfile(TestCase):
         response = self.client.get(reverse('user_profile', kwargs={'user_pk': 3}))
         self.assertContains(response, 'You are logged in,')
         self.assertContains(response, '<a href="/user/profile/2/">bob</a>.')
+
+    def test_edit_profile_requires_login(self):
+        """ Verify user must be logged in to edit profile """
+        response = self.client.get(reverse('edit_profile'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_logged_in_user_can_view_edit_profile(self):
+        """ Verify logged-in user can access edit profile page"""
+        user = User.objects.get(pk=2)
+        self.client.force_login(user)
+
+        response = self.client.get(reverse('edit_profile'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_user_can_update_profile(self):
+        """ Verify logged-in user can update profile info"""
+        user = User.objects.get(pk=2)
+        self.client.force_login(user)
+
+        self.client.post(reverse('edit_profile'), {
+            'bio': 'I love music!',
+            'favorite_artist': 'Bob',
+            'favorite_genre': 'Pop',
+            'favorite_show': ''
+        })
+
+        profile = Profile.objects.get(user=user)
+
+        self.assertEqual(profile.bio, 'I love music!')
+        self.assertEqual(profile.favorite_artist, 'Bob')
+        self.assertEqual(profile.favorite_genre, 'Pop')
 
 
 class TestUserAuthentication(TestCase):

@@ -14,7 +14,7 @@
 
   {% if user == note.user %}
     <br>
-    <a href="{% url 'edit_note' note_pk=note.pk %}">Edit</a>
+    <p><a href="{% url 'edit_note' note_pk=note.pk %}">Edit</a></p>
   {% endif %}
 
 {% endblock %}

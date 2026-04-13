@@ -198,10 +198,6 @@ input[type="submit"] {
     color: #1d4ed8; /* match site blue */
 }
 
-.profile-header {
-    margin-bottom: 10px;
-}
-
 /* Make edit profile look like a button */
 #edit-profile-link {
     display: inline-block;
@@ -210,6 +206,4 @@ input[type="submit"] {
     padding: 8px 14px;
     border-radius: 5px;
     text-decoration: none;
-    margin-bottom: 10px;
 }
-

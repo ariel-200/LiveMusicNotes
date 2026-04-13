@@ -35,6 +35,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('show_date', models.DateTimeField()),
+                ('end_date', models.DateTimeField()),
                 ('artist', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='lmn.artist')),
                 ('venue', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='lmn.venue')),
             ],

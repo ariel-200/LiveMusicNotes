@@ -3,6 +3,10 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from lmn.forms import NewNoteForm, UserRegistrationForm
 import string
+import io
+
+from django.core.files.uploadedfile import SimpleUploadedFile
+from PIL import Image
 
 # Test that forms are validating correctly, and don't accept invalid data
 
@@ -51,17 +55,37 @@ class NewNoteFormTests(TestCase):
         self.assertTrue(form.is_valid())
 
 
+class NoteImageFormTests(TestCase):
+
+    def test_form_is_valid_without_image(self):
+        """
+        Ensure the blank and null field parameters are respected 
+        """
+        form_data = {'title': 'Good show', 'text': 'We had a good time.'}
+        form = NewNoteForm(form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_form_is_invalid_with_non_image_file(self):
+        """
+        Ensure that the uploaded file is an image file.
+        """
+        fake_file = SimpleUploadedFile('notes.txt', b'not an image', content_type='text/plain')
+        form_data = {'title': 'Great show', 'text': 'Really enjoyed it'}
+        form = NewNoteForm(form_data, {'image': fake_file})
+        self.assertFalse(form.is_valid())
+
+
 class RegistrationFormTests(TestCase):
 
     # check for missing fields
 
     def test_register_user_with_valid_data_is_valid(self):
         form_data = {
-            'username': 'bob', 
-            'email': 'bob@bob.com', 
-            'first_name': 'bob', 
-            'last_name': 'whatever', 
-            'password1': 'q!w$er^ty6ui7op', 
+            'username': 'bob',
+            'email': 'bob@bob.com',
+            'first_name': 'bob',
+            'last_name': 'whatever',
+            'password1': 'q!w$er^ty6ui7op',
             'password2': 'q!w$er^ty6ui7op'
         }
 
@@ -70,11 +94,11 @@ class RegistrationFormTests(TestCase):
 
     def test_register_user_with_missing_data_fails(self):
         form_data = {
-            'username': 'bob', 
-            'email': 'bob@bob.com', 
-            'first_name': 'bob', 
-            'last_name': 'whatever', 
-            'password1': 'q!w$er^ty6ui7op', 
+            'username': 'bob',
+            'email': 'bob@bob.com',
+            'first_name': 'bob',
+            'last_name': 'whatever',
+            'password1': 'q!w$er^ty6ui7op',
             'password2': 'q!w$er^ty6ui7op'
         }
 
@@ -87,11 +111,11 @@ class RegistrationFormTests(TestCase):
 
     def test_register_user_with_password_mismatch_fails(self):
         form_data = {
-            'username': 'another_bob', 
-            'email': 'bob@bob.com', 
-            'first_name': 'bob', 
-            'last_name': 'whatever', 
-            'password1': 'q!w$er^ty6ui7op', 
+            'username': 'another_bob',
+            'email': 'bob@bob.com',
+            'first_name': 'bob',
+            'last_name': 'whatever',
+            'password1': 'q!w$er^ty6ui7op',
             'password2': 'dr%$ESwsdgdfh'
         }
 
@@ -105,11 +129,11 @@ class RegistrationFormTests(TestCase):
 
         # attempt to create another user with same email
         form_data = {
-            'username': 'another_bob', 
-            'email': 'bob@bob.com', 
-            'first_name': 'bob', 
-            'last_name': 'whatever', 
-            'password1': 'q!w$er^ty6ui7op', 
+            'username': 'another_bob',
+            'email': 'bob@bob.com',
+            'first_name': 'bob',
+            'last_name': 'whatever',
+            'password1': 'q!w$er^ty6ui7op',
             'password2': 'q!w$er^ty6ui7op'
         }
 
@@ -124,11 +148,11 @@ class RegistrationFormTests(TestCase):
 
         # attempt to create another user with same username
         form_data = {
-            'username': 'bob', 
-            'email': 'another_bob@bob.com', 
-            'first_name': 'bob', 
-            'last_name': 'whatever', 
-            'password1': 'q!w$er^ty6ui7op', 
+            'username': 'bob',
+            'email': 'another_bob@bob.com',
+            'first_name': 'bob',
+            'last_name': 'whatever',
+            'password1': 'q!w$er^ty6ui7op',
             'password2': 'q!w$er^ty6ui7op'
         }
 
@@ -145,11 +169,11 @@ class RegistrationFormTests(TestCase):
         for invalid in invalid_username:
             # attempt to create another user with same username
             form_data = {
-                'username': invalid, 
-                'email': 'another_bob@bob.com', 
-                'first_name': 'bob', 
-                'last_name': 'whatever', 
-                'password1': 'q!w$er^ty6ui7op', 
+                'username': invalid,
+                'email': 'another_bob@bob.com',
+                'first_name': 'bob',
+                'last_name': 'whatever',
+                'password1': 'q!w$er^ty6ui7op',
                 'password2': 'q!w$er^ty6ui7opq!w$er^ty6ui7op'
             }
 
@@ -166,11 +190,11 @@ class RegistrationFormTests(TestCase):
         for invalid in invalid_email:
             # attempt to create another user with same username
             form_data = {
-                'username': 'another_bob', 
-                'email': invalid, 
-                'first_name': 'bob', 
-                'last_name': 'whatever', 
-                'password1': 'q!w$er^ty6ui7op', 
+                'username': 'another_bob',
+                'email': invalid,
+                'first_name': 'bob',
+                'last_name': 'whatever',
+                'password1': 'q!w$er^ty6ui7op',
                 'password2': 'q!w$er^ty6ui7op'
             }
             form = UserRegistrationForm(form_data)

@@ -45,18 +45,21 @@ class Show(models.Model):
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
 
     def clean(self):
-        if self.show_date <= self.show_date:
-            raise ValidationError({'end_date': 'Error: End datetime cannot be earlier than start datetime!'})
-        overlap = Show.objects.filter( show_date__lt=self.end_date, end_date__gt=self.show_date, venue=self.venue).exclude(pk=self.pk).exists()
-
-        if overlap:
-                raise ValidationError('Error: Time/venue slot overlaps with existing show!')
 
         if not self.show_date:
             raise ValidationError({'show_date': 'Error: Invalid start datetime!'})
 
         if not self.end_date:
             raise ValidationError({'end_date': 'Error: Invalid end datetime!'})
+
+        if self.end_date <= self.show_date:
+            raise ValidationError({'end_date': 'Error: End datetime cannot be earlier than start datetime!'})
+
+        overlap = Show.objects.filter( show_date__lt=self.end_date, end_date__gt=self.show_date, venue=self.venue).exclude(pk=self.pk).exists()
+
+        if overlap:
+            raise ValidationError('Error: Time/venue slot overlaps with existing show!')
+
 
     def __str__(self):
         return f'Artist: {self.artist} At: {self.venue} On: {self.show_date} To: {self.end_date}'

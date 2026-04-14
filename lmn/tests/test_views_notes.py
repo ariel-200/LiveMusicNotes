@@ -143,7 +143,6 @@ class TestNotes(TestCase):
         response = self.client.get(reverse('new_note', kwargs={'show_pk': 1}))
         self.assertTemplateUsed(response, 'lmn/notes/new_note.html')
 
-<<<<<<< issue-7-future-show-notes
 class TestFutureShowRestriction(TestCase):
     fixtures = ['testing_users', 'testing_artists', 'testing_venues']
 
@@ -164,9 +163,7 @@ class TestFutureShowRestriction(TestCase):
                 self.assertEqual(response.status_code,403)
 
 
-=======
 class TestEditNotes(TestCase):
-
     fixtures = ['testing_users', 'testing_artists', 'testing_venues', 'testing_shows', 'testing_notes']
 
     def setUp(self):
@@ -190,4 +187,4 @@ class TestEditNotes(TestCase):
         response = self.client.get(reverse('edit_note', kwargs={'note_pk': 1}))
         self.assertContains(response, 'ok')
         self.assertContains(response, 'kinda ok')
->>>>>>> main
+

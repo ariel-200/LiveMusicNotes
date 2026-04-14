@@ -102,6 +102,15 @@ class TestAddNotesWhenUserLoggedIn(TestCase):
 
         self.assertRedirects(response, reverse('note_detail', kwargs={'note_pk': new_note.pk}))
 
+    def test_user_cannot_add_second_note_for_same_show(self):
+     Note.objects.create(show=self.new_show, user=User.objects.first(), title='first', text='first note')
+
+     response = self.client.post(
+            reverse('new_note', kwargs={'show_pk': self.new_show.pk}), {'title': 'second', 'text': 'second note'})
+
+     self.assertEqual(response.status_code, 400)
+     self.assertEqual(Note.objects.filter(user= User.objects.first(), show=self.new_show).count(),1)
+
 
 class TestNotes(TestCase):
     fixtures = ['testing_users', 'testing_artists', 'testing_venues', 'testing_shows', 'testing_notes'] 

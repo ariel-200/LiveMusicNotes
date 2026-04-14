@@ -4,7 +4,11 @@
 
   <h2 id="show-title">Notes for {{ show.artist.name }} at {{ show.venue.name }} on {{ show.show_date }}</h2>
 
-  <a id="add-new-show-link" href="{% url 'new_note' show_pk=show.pk %}">Add your own notes for this show</a>
+  {% if not user_note %}
+    <a id="add-new-show-link" href="{% url 'new_note' show_pk=show.pk %}">Add your own notes for this show</a>
+  {% else %}
+     <p>You have already added a note for this show.</p>
+  {% endif %}
 
   {% for note in notes %}
 

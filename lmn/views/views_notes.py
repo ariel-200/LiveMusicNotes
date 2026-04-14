@@ -1,6 +1,10 @@
 """ Views related to creating and viewing Notes for shows. """
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+
+import os
+from django.conf import settings
 
 from ..models import Note, Show
 from ..forms import NewNoteForm
@@ -19,7 +23,7 @@ def new_note(request, show_pk):
         return HttpResponseBadRequest('You have already added a note for this show.')
 
     if request.method == 'POST':
-        form = NewNoteForm(request.POST)
+        form = NewNoteForm(request.POST, request.FILES)
         if form.is_valid():
             note = form.save(commit=False)
             note.user = request.user
@@ -54,3 +58,20 @@ def note_detail(request, note_pk):
     """ Display one note. """
     note = get_object_or_404(Note, pk=note_pk)
     return render(request, 'lmn/notes/note_detail.html', {'note': note})
+
+@login_required
+def edit_note(request, note_pk):
+    """ Edit own existing note. """
+    note = get_object_or_404(Note, pk=note_pk)
+    if request.user != note.user:
+        return HttpResponseForbidden()
+    if request.method == 'POST':
+        form = NewNoteForm(request.POST, request.FILES, instance=note)
+        if form.is_valid():
+            form.save()
+            return redirect('note_detail', note_pk=note.pk)
+    else:
+        form = NewNoteForm(instance=note)
+    return render(request, 'lmn/notes/edit_note.html', {'form': form, 'note': note})
+    
+    

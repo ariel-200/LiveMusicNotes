@@ -1,26 +1,68 @@
 :root {
-  --link-color: #18eef5;
+  --link-color: #216d9a;
 }
 
 body {
-  font-family: monospace;
-  background: #282e2e;
-  color: antiquewhite;
+    font-family: Arial, Helvetica, sans-serif; /* easier to read than monospace */
+    background-color: #eef4ff; /* soft light blue */
+    color: #1f1f1f; /* dark text for contrast */
+}
+
+body > * {
+    max-width: 1000px; /* keeps content centered */
+    margin: 0 auto;
+    padding: 0 15px;
 }
 
 a {
-  color: var(--link-color)
+    color: #1d4ed8; /* cleaner blue */
+    text-decoration: underline;
+}
+
+h1 {
+    text-align: center;
+    color: #1d4ed8; /* lighter blue */
+    margin-bottom: 15px;
+}
+
+h2 {
+    color: #3452ae; /* darker navy for section titles */
+    margin-bottom: 10px;
+}
+
+h3 {
+    color: #1d4ed8;
+    margin-bottom: 10px;
 }
 
 #add-new-show-link {
-  font-size: large;
-  color: violet;
+    display: inline-block;
+    background-color: #1d4ed8;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-top: 15px;
+    margin-bottom: 15px;
+
+    margin-left: calc((100% - 1000px) / 2 + 5px);
+    /* lines it up with centered content */
 }
 
-#welcome-user-msg, #login-or-sign-up {
-  position: absolute;
-  right: 0px;
-  padding-right: 10px;
+#add-new-show-link:hover {
+    background-color: #1e40af;
+    text-decoration: none;
+}
+
+#login-or-sign-up {
+    text-align: right;       /* push login to right */
+    margin-top: 10px;
+}
+
+#welcome-user-msg {
+    text-align: right;
+    margin-top: 10px;         /* small spacing between them */
+    margin-bottom: 15px;
 }
 
 .error {
@@ -48,4 +90,101 @@ a {
 #logout-form {
   display: inline; 
   color: var(--link-color)
+}
+
+/* Add better spacing for paragraphs and sections */
+p {
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+/* Give lists and detail content a little breathing room */
+li {
+    margin-bottom: 10px;
+}
+
+/* ===== FORM STYLING ===== */
+
+/* Make form fields easier to read and use */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="datetime-local"],
+select,
+textarea {
+    width: 100%;
+    max-width: 500px;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #93c5fd;
+    border-radius: 5px;
+    box-sizing: border-box; /* keeps size consistent */
+    font: inherit;
+}
+
+/* Give text areas more room */
+textarea {
+    min-height: 100px;
+}
+
+/* Put labels on their own line */
+label {
+    display: block;
+    margin-top: 10px;
+}
+
+/* Style regular buttons */
+button,
+input[type="submit"] {
+    background-color: #1d4ed8;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    font: inherit;
+}
+
+/* Keep logout button looking like a link */
+#logout-button,
+#logout-button:hover {
+    background: transparent;
+    color: currentColor;
+    text-decoration: underline;
+    padding: 0;
+}
+
+/* ===== TOP NAVIGATION ===== */
+.nav-bar {
+    display: flex;
+    justify-content: space-between; /* links left, login/logout right */
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.nav-left {
+    display: flex;
+    gap: 20px; /* space between top links */
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* space between welcome text and logout */
+}
+
+#welcome-user-msg,
+#login-or-sign-up {
+    margin: 0;
+    text-align: right;
+}
+
+.note-image {
+    display: block;
+    width:50%;
+    height: auto;
+    margin-left: calc((100% - 1040px) / 2 + 5px);
+    /* lines it up with centered content */
 }

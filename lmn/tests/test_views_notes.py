@@ -33,7 +33,8 @@ class TestAddNotesWhenUserLoggedIn(TestCase):
         user = User.objects.first()
         self.client.force_login(user)
 
-        self.new_show = Show.objects.create( artist_id=1, venue_id=1, show_date=timezone.now() -timedelta(days=1))
+        self.new_show = Show.objects.create( artist_id=1, venue_id=1, show_date=timezone.now() -timedelta(days=1),
+                                             end_date=timezone.now() - timedelta(days=1) + timedelta(hours=1))
 
     def test_save_note_for_non_existent_show_is_error(self):
         new_note_url = reverse('new_note', kwargs={'show_pk': 10000})
@@ -150,6 +151,33 @@ class TestNotes(TestCase):
         # Log someone in, add note
         self.client.force_login(User.objects.first())
 
-        show = Show.objects.create(artist_id=1,venue_id=1,show_date=timezone.now() - timedelta(days=1))
+        show = Show.objects.create(artist_id=1,venue_id=1,show_date=timezone.now() - timedelta(days=1),
+                                   end_date=timezone.now() - timedelta(days=1) + timedelta(hours=1))
         response = self.client.get(reverse('new_note', kwargs={'show_pk': show.pk}))
         self.assertTemplateUsed(response, 'lmn/notes/new_note.html')
+
+class TestEditNotes(TestCase):
+
+    fixtures = ['testing_users', 'testing_artists', 'testing_venues', 'testing_shows', 'testing_notes']
+
+    def setUp(self):
+        # Logs in as test user prior to running below tests
+        self.client.force_login(User.objects.get(username='alice'))
+
+    def test_different_user_attempt_edit(self):
+        self.client.force_login(User.objects.get(username='bob'))
+        response = self.client.get(reverse('edit_note', kwargs={'note_pk': 1}))
+        self.assertEqual(response.status_code, 403)
+    
+    def test_edit_button_hidden_when_wrong_user(self):
+        # Verify non-author cannot see edit button
+        # Alice is logged in via setUp, note 2 belongs to bob
+        response = self.client.get(reverse('note_detail', kwargs={'note_pk': 2}))
+        self.assertNotContains(response, 'Edit')
+    
+    def test_note_prefill_with_form_data(self):
+        # Verify note is prefilled with correct information
+        # Alice is logged in via setUp and owns note 1 (title='ok', text='kinda ok')
+        response = self.client.get(reverse('edit_note', kwargs={'note_pk': 1}))
+        self.assertContains(response, 'ok')
+        self.assertContains(response, 'kinda ok')

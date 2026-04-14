@@ -14,29 +14,38 @@
 
     <h1>LMN</h1>
 
-    <a href="{% url 'venue_list' %}">Venues</a>
-    <a href="{% url 'artist_list' %}">Artists</a>
-    <a href="{% url 'latest_notes' %}">Notes</a>
+    <div class="nav-bar">
+    <div class="nav-left">
+        <a href="{% url 'venue_list' %}">Venues</a>
+        <a href="{% url 'artist_list' %}">Artists</a>
+        <a href="{% url 'latest_notes' %}">Notes</a>
+    </div>
 
-    {% if user.is_authenticated %}
+    <div class="nav-right">
+        {% if user.is_authenticated %}
+            <span id="welcome-user-msg">
+                You are logged in,
+                <a href="{% url 'user_profile' user_pk=user.pk %}">{{ user.username }}</a>.
+            </span>
 
-      <span id="welcome-user-msg">You are logged in, <a href="{% url 'user_profile' user_pk=user.pk %}">{{ user.username }}</a>.
-        <form id="logout-form" action="{% url 'logout' %}" method="post">
-          {% csrf_token %}
-          <button id="logout-button" type="submit">Logout</button> 
-        </form>
-      </span>
-
-    {% else %}
-
-      <span id="login-or-sign-up"><a href="{% url 'login' %}?next={{ request.path }}">Login or sign up</a></span>
-
-    {% endif %}
+            <form id="logout-form" action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button id="logout-button" type="submit">Logout</button>
+            </form>
+        {% else %}
+            <span id="login-or-sign-up">
+                <a href="{% url 'login' %}?next={{ request.path }}">Login or sign up</a>
+            </span>
+        {% endif %}
+    </div>
+    </div>
 
     <hr>
 
     {% block content %}
     {% endblock %}
+
+    <script src="{% static 'js/confirm-logout.js'%}"></script>
 
   </body>
 </html>

@@ -1,8 +1,11 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from lmn.models import Artist, Venue, Show
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
+from django.utils import timezone
+from datetime import timedelta
+from lmn.models import Artist,Venue,Show,Note
+
 from datetime import datetime
 
 class TestUser(TestCase):
@@ -22,6 +25,19 @@ class TestUser(TestCase):
         user2 = User(username='bob', email='bob@bob.com', first_name='bob', last_name='bob')
         with self.assertRaises(IntegrityError):
             user2.save()
+
+class TestNoteModel(TestCase):
+
+    def setUp(self):
+        self.artist = Artist.objects.create(name='Test Artist')
+        self.venue = Venue.objects.create(name='Test Venue', city='Minneapolis', state='MN')
+        self.user = User.objects.create(username='testuser', email='test@example.com', first_name='Test', last_name='User')
+
+    def test_cannot_create_note_for_future_show(self):
+        show = Show.objects.create(artist=self.artist, venue=self.venue, show_date=timezone.now() + timedelta(days=5), end_date=timezone.now() + timedelta(days=5, hours=2))
+        note = Note(show=show,user=self.user, title='test title', text='test text')
+        with self.assertRaises(ValidationError):
+            note.full_clean()
 
 class TestShow(TestCase):
     # evaluate show creation conflicts

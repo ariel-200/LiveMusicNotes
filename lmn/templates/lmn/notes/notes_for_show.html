@@ -2,12 +2,16 @@
 
 {% block content %}
 
-<h2 id="show-title">Notes for {{ show.artist.name }} at {{ show.venue.name }} on {{ show.show_date }} - {{ show.end_date }}</h2>
+  <h2 id="show-title">Notes for {{ show.artist.name }} at {{ show.venue.name }} on {{ show.show_date }} - {{show.end_date}}</h2>
 
-  {% if not user_note %}
-    <a id="add-new-show-link" href="{% url 'new_note' show_pk=show.pk %}">Add your own notes for this show</a>
+  {% if show.show_date <= now %}
+    {% if not user_note %}
+      <a id="add-new-show-link" href="{% url 'new_note' show_pk=show.pk %}">Add your own notes for this show</a>
+    {% else %}
+       <p>You have already added a note for this show.</p>
+    {% endif %}
   {% else %}
-     <p>You have already added a note for this show.</p>
+    <p>You can only add notes after the show has happened.</p>
   {% endif %}
 
   {% for note in notes %}
@@ -15,11 +19,11 @@
     <div id="note_{{ note.pk }}">
       <p class="note-info">Posted on: {{ note.posted_date }}</p>
 
-      <p>Posted by: 
+      <p>Posted by:
         <a class="user" href="{% url 'user_profile' user_pk=note.user.pk %}">{{ note.user.username }}</a>
       </p>
 
-      <p class="note-text">{{ note.text|truncatechars:100 }}</p> 
+      <p class="note-text">{{ note.text|truncatechars:100 }}</p>
 
       <a href="{% url 'note_detail' note_pk=note.pk %}">Note details</a>
     </div>

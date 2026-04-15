@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-
+from django.utils import timezone
 
 # Remember that every model gets a primary key field by default.
 
@@ -83,6 +83,15 @@ class Note(models.Model):
     text = models.TextField(max_length=1000, blank=False)
     posted_date = models.DateTimeField(auto_now_add=True, blank=False)
     image = models.ImageField(upload_to='images/', blank=True, null=True)
+
+    def clean(self):
+        super().clean()
+
+        if not self.show_id:
+            return
+
+        if self.show and self.show.show_date > timezone.now():
+            raise ValidationError('Cannot add notes for future shows.')
 
     def __str__(self):
         return f'User: {self.user} Show: {self.show} Note title: {self.title} \

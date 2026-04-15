@@ -40,6 +40,12 @@ class TestNoteModel(TestCase):
         with self.assertRaises(IntegrityError):
            Note.objects.create(show=self.show, user=self.user, title='second', text='second note')
 
+    def test_cannot_create_note_for_future_show(self):
+        show = Show.objects.create(artist=self.artist, venue=self.venue, show_date=timezone.now() + timedelta(days=5), end_date=timezone.now() + timedelta(days=5, hours=2))
+        note = Note(show=show,user=self.user, title='test title', text='test text')
+        with self.assertRaises(ValidationError):
+            note.full_clean()
+
 class TestShow(TestCase):
     # evaluate show creation conflicts
 

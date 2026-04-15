@@ -11,16 +11,24 @@ from ..forms import NewNoteForm
 
 from django.http import HttpResponseBadRequest
 
+from django.utils import timezone
 
 @login_required
 def new_note(request, show_pk):
     """ Create a new note for a show. """
     show = get_object_or_404(Show, pk=show_pk)
 
+
     existing_note= Note.objects.filter(user=request.user, show=show).first()
 
     if existing_note:
         return HttpResponseBadRequest('You have already added a note for this show.')
+
+    #Prevent creating notes for future shows
+    if show.show_date > timezone.now():
+        return HttpResponseForbidden('You cannot add notes for future shows. ')
+
+
 
     if request.method == 'POST':
         form = NewNoteForm(request.POST, request.FILES)
@@ -28,6 +36,7 @@ def new_note(request, show_pk):
             note = form.save(commit=False)
             note.user = request.user
             note.show = show
+            note.full_clean()
             note.save()
             return redirect('note_detail', note_pk=note.pk)
     else:
@@ -52,6 +61,8 @@ def notes_for_show(request, show_pk):
         user_note = Note.objects.filter(user=request.user, show=show).first()
 
     return render(request, 'lmn/notes/notes_for_show.html', {'show': show, 'notes': notes, 'user_note':user_note})
+
+    return render(request, 'lmn/notes/notes_for_show.html', {'show': show, 'notes': notes, 'now': timezone.now() })
 
 
 def note_detail(request, note_pk):

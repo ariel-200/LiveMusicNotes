@@ -1,0 +1,122 @@
+[
+  {
+    "model": "lmn.show",
+    "pk": 1,
+    "fields": {
+      "show_date": "2026-02-05T20:00:00-00:00",
+      "end_date": "2026-02-05T22:00:00-00:00",
+      "artist": 5,
+      "venue": 12
+    }
+  },
+  {
+    "model": "lmn.show",
+    "pk": 2,
+    "fields": {
+      "show_date": "2026-02-20T19:30:00-00:00",
+      "end_date": "2026-02-20T21:30:00-00:00",
+      "artist": 12,
+      "venue": 3
+    }
+  },
+  {
+    "model": "lmn.show",
+    "pk": 3,
+    "fields": {
+      "show_date": "2026-03-11T18:00:00-00:00",
+      "end_date": "2026-03-11T20:00:00-00:00",
+      "artist": 2,
+      "venue": 8
+    }
+  },
+  {
+    "model": "lmn.show",
+    "pk": 4,
+    "fields": {
+      "show_date": "2026-03-25T21:00:00-00:00",
+      "end_date": "2026-03-25T23:00:00-00:00",
+      "artist": 9,
+      "venue": 1
+    }
+  },
+  {
+    "model": "lmn.show",
+    "pk": 5,
+    "fields": {
+      "show_date": "2026-04-02T20:00:00-00:00",
+      "end_date": "2026-04-02T22:00:00-00:00",
+      "artist": 1,
+      "venue": 10
+    }
+  },
+  {
+    "model": "lmn.show",
+    "pk": 6,
+    "fields": {
+      "show_date": "2026-04-18T19:00:00-00:00",
+      "end_date": "2026-04-18T21:00:00-00:00",
+      "artist": 7,
+      "venue": 4
+    }
+  },
+  {
+    "model": "lmn.show",
+    "pk": 7,
+    "fields": {
+      "show_date": "2026-05-09T20:30:00-00:00",
+      "end_date": "2026-05-09T22:30:00-00:00",
+      "artist": 11,
+      "venue": 2
+    }
+  },
+  {
+    "model": "lmn.show",
+    "pk": 8,
+    "fields": {
+      "show_date": "2026-05-23T18:00:00-00:00",
+      "end_date": "2026-05-23T20:00:00-00:00",
+      "artist": 4,
+      "venue": 6
+    }
+  },
+  {
+    "model": "lmn.show",
+    "pk": 9,
+    "fields": {
+      "show_date": "2026-06-04T21:00:00-00:00",
+      "end_date": "2026-06-04T23:00:00-00:00",
+      "artist": 8,
+      "venue": 11
+    }
+  },
+  {
+    "model": "lmn.show",
+    "pk": 10,
+    "fields": {
+      "show_date": "2026-06-19T19:00:00-00:00",
+      "end_date": "2026-06-19T21:00:00-00:00",
+      "artist": 3,
+      "venue": 9
+    }
+  },
+  {
+    "model": "lmn.show",
+    "pk": 11,
+    "fields": {
+      "show_date": "2026-07-07T20:00:00-00:00",
+      "end_date": "2026-07-07T22:00:00-00:00",
+      "artist": 6,
+      "venue": 5
+    }
+  },
+  {
+    "model": "lmn.show",
+    "pk": 12,
+    "fields": {
+      "show_date": "2026-07-21T18:30:00-00:00",
+      "end_date": "2026-07-21T20:30:00-00:00",
+      "artist": 10,
+      "venue": 7
+    }
+  }
+]

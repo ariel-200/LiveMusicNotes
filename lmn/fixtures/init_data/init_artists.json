@@ -1,0 +1,86 @@
+[
+  {
+    "model": "lmn.artist",
+    "pk": 1,
+    "fields": {
+      "name": "The Neon Echo"
+    }
+  },
+  {
+    "model": "lmn.artist",
+    "pk": 2,
+    "fields": {
+      "name": "Velvet Horizon"
+    }
+  },
+  {
+    "model": "lmn.artist",
+    "pk": 3,
+    "fields": {
+      "name": "Static Dreamers"
+    }
+  },
+  {
+    "model": "lmn.artist",
+    "pk": 4,
+    "fields": {
+      "name": "Midnight Palette"
+    }
+  },
+  {
+    "model": "lmn.artist",
+    "pk": 5,
+    "fields": {
+      "name": "Copper & Clay"
+    }
+  },
+  {
+    "model": "lmn.artist",
+    "pk": 6,
+    "fields": {
+      "name": "The Silver Tide"
+    }
+  },
+  {
+    "model": "lmn.artist",
+    "pk": 7,
+    "fields": {
+      "name": "Ghost of a Garden"
+    }
+  },
+  {
+    "model": "lmn.artist",
+    "pk": 8,
+    "fields": {
+      "name": "Fable Theory"
+    }
+  },
+  {
+    "model": "lmn.artist",
+    "pk": 9,
+    "fields": {
+      "name": "Quartz Quartet"
+    }
+  },
+  {
+    "model": "lmn.artist",
+    "pk": 10,
+    "fields": {
+      "name": "Loom & Lyric"
+    }
+  },
+  {
+    "model": "lmn.artist",
+    "pk": 11,
+    "fields": {
+      "name": "Electric Willow"
+    }
+  },
+  {
+    "model": "lmn.artist",
+    "pk": 12,
+    "fields": {
+      "name": "Amber Syndicate"
+    }
+  }
+]

@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('lmn', '0006_merge_20260408_1439'),
+        ('lmn', '0005_alter_note_image'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 

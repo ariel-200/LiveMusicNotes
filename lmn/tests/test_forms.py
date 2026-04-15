@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from django.contrib.auth.models import User
-from lmn.forms import NewNoteForm, UserRegistrationForm
+from lmn.forms import NewNoteForm, UserRegistrationForm, ProfileForm
 import string
 import io
 
@@ -199,3 +199,28 @@ class RegistrationFormTests(TestCase):
             }
             form = UserRegistrationForm(form_data)
             self.assertFalse(form.is_valid())
+
+
+class ProfileFormTests(TestCase):
+
+    def test_profile_form_valid_data(self):
+        """ Verify form is valid with normal input"""
+        form_data = {
+            'bio': 'I love live music.',
+            'favorite_artist': 'Bob',
+            'favorite_genre': 'Pop',
+            'favorite_show': ''
+        }
+        form = ProfileForm(form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_profile_form_blank_data(self):
+        """ Verify optional fields can be left blank """
+        form_data = {
+            'bio': '',
+            'favorite_artist': '',
+            'favorite_genre': '',
+            'favorite_show': ''
+        }
+        form = ProfileForm(form_data)
+        self.assertTrue(form.is_valid())

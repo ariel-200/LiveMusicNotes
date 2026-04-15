@@ -1,8 +1,7 @@
 from django.db import models
-from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-
+from django.utils import timezone
 
 # Remember that every model gets a primary key field by default.
 
@@ -97,6 +96,24 @@ class Note(models.Model):
     def __str__(self):
         return f'User: {self.user} Show: {self.show} Note title: {self.title} \
         Text: {self.text} Posted on: {self.posted_date}'
+
+    class Meta:
+        constraints =[
+            models.UniqueConstraint(fields=['user', 'show'], name='unique_user_show_note')
+        ]
+
+    def save(self, *args, **kwargs):
+        '''
+        Overrides save to verify that images are deleted from the media directory when they are deleted fromt the database
+        '''
+        if self.pk:
+            old_image = Note.objects.get(pk=self.pk).image
+            super().save(*args, **kwargs)
+            if old_image and old_image != self.image:
+                old_image.delete(save=False)
+        else:
+            super().save(*args, **kwargs)
+
 
 
 class Profile(models.Model):

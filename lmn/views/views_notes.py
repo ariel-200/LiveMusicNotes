@@ -1,5 +1,4 @@
 """ Views related to creating and viewing Notes for shows. """
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
@@ -8,9 +7,10 @@ import os
 from django.conf import settings
 
 from ..models import Note, Show
-from ..forms import NewNoteForm 
+from ..forms import NewNoteForm
 
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseBadRequest
+
 from django.utils import timezone
 
 @login_required
@@ -18,9 +18,16 @@ def new_note(request, show_pk):
     """ Create a new note for a show. """
     show = get_object_or_404(Show, pk=show_pk)
 
+
+    existing_note= Note.objects.filter(user=request.user, show=show).first()
+
+    if existing_note:
+        return HttpResponseBadRequest('You have already added a note for this show.')
+
     #Prevent creating notes for future shows
     if show.show_date > timezone.now():
         return HttpResponseForbidden('You cannot add notes for future shows. ')
+
 
 
     if request.method == 'POST':
@@ -48,6 +55,13 @@ def notes_for_show(request, show_pk):
     """ Get notes for one show, most recent first. """
     show = get_object_or_404(Show, pk=show_pk)  
     notes = Note.objects.filter(show=show_pk).order_by('-posted_date')
+
+    user_note = None
+    if request.user.is_authenticated:
+        user_note = Note.objects.filter(user=request.user, show=show).first()
+
+    return render(request, 'lmn/notes/notes_for_show.html', {'show': show, 'notes': notes, 'user_note':user_note})
+
     return render(request, 'lmn/notes/notes_for_show.html', {'show': show, 'notes': notes, 'now': timezone.now() })
 
 

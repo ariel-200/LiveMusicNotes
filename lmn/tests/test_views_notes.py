@@ -4,7 +4,12 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from lmn.models import Note
 
+from django.utils import timezone
+from datetime import timedelta
+
 import datetime
+
+from lmn.models import  Show
 
 
 class TestNoNotesViews(TestCase):
@@ -130,7 +135,6 @@ class TestNotes(TestCase):
 
         response = self.client.get(reverse('note_detail', kwargs={'note_pk': 1}))
         self.assertTemplateUsed(response, 'lmn/notes/note_detail.html')
-
         response = self.client.get(reverse('notes_for_show', kwargs={'show_pk': 1}))
         self.assertTemplateUsed(response, 'lmn/notes/notes_for_show.html')
 
@@ -138,3 +142,49 @@ class TestNotes(TestCase):
         self.client.force_login(User.objects.first())
         response = self.client.get(reverse('new_note', kwargs={'show_pk': 1}))
         self.assertTemplateUsed(response, 'lmn/notes/new_note.html')
+
+class TestFutureShowRestriction(TestCase):
+    fixtures = ['testing_users', 'testing_artists', 'testing_venues']
+
+    def setUp(self):
+        self.client.force_login(User.objects.first())
+
+
+        self.future_show = Show.objects.create(
+            artist_id=1,venue_id=1, show_date=timezone.now() +timedelta(days=5),end_date=timezone.now() + timedelta(days=5,hours=2))
+    def test_future_show_blocked(self):
+            response= self.client.post(reverse('new_note', kwargs={'show_pk':self.future_show.pk}),{'title':'t','text':'t'})
+            self.assertEqual(response.status_code,403)
+
+    def test_future_show_get_blocked(self):
+                response = self.client.get(
+                    reverse('new_note', kwargs={'show_pk': self.future_show.pk})
+                )
+                self.assertEqual(response.status_code,403)
+
+
+class TestEditNotes(TestCase):
+    fixtures = ['testing_users', 'testing_artists', 'testing_venues', 'testing_shows', 'testing_notes']
+
+    def setUp(self):
+        # Logs in as test user prior to running below tests
+        self.client.force_login(User.objects.get(username='alice'))
+
+    def test_different_user_attempt_edit(self):
+        self.client.force_login(User.objects.get(username='bob'))
+        response = self.client.get(reverse('edit_note', kwargs={'note_pk': 1}))
+        self.assertEqual(response.status_code, 403)
+    
+    def test_edit_button_hidden_when_wrong_user(self):
+        # Verify non-author cannot see edit button
+        # Alice is logged in via setUp, note 2 belongs to bob
+        response = self.client.get(reverse('note_detail', kwargs={'note_pk': 2}))
+        self.assertNotContains(response, 'Edit')
+    
+    def test_note_prefill_with_form_data(self):
+        # Verify note is prefilled with correct information
+        # Alice is logged in via setUp and owns note 1 (title='ok', text='kinda ok')
+        response = self.client.get(reverse('edit_note', kwargs={'note_pk': 1}))
+        self.assertContains(response, 'ok')
+        self.assertContains(response, 'kinda ok')
+

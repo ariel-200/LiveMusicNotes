@@ -84,6 +84,15 @@ class Note(models.Model):
     posted_date = models.DateTimeField(auto_now_add=True, blank=False)
     image = models.ImageField(upload_to='images/', blank=True, null=True)
 
+    def clean(self):
+        super().clean()
+
+        if not self.show_id:
+            return
+
+        if self.show and self.show.show_date > timezone.now():
+            raise ValidationError('Cannot add notes for future shows.')
+
     def __str__(self):
         return f'User: {self.user} Show: {self.show} Note title: {self.title} \
         Text: {self.text} Posted on: {self.posted_date}'

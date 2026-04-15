@@ -12,4 +12,9 @@
   <img class="note-image" src="{{ note.image.url }}" alt="Note image for {{ note.title }}" width="50%" height="auto">
   {% endif %}
 
+  {% if user == note.user %}
+    <br>
+    <p><a href="{% url 'edit_note' note_pk=note.pk %}">Edit</a></p>
+  {% endif %}
+
 {% endblock %}

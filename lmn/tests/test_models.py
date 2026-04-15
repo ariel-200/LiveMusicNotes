@@ -1,12 +1,11 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.db import IntegrityError
-from django.core.exceptions import ValidationError
 from django.utils import timezone
-from datetime import timedelta
-from lmn.models import Artist,Venue,Show,Note
+from datetime import timedelta, datetime
+from lmn.models import Artist, Venue, Show, Note
+from django.core.exceptions import ValidationError
 
-from datetime import datetime
 
 class TestUser(TestCase):
 
@@ -28,10 +27,18 @@ class TestUser(TestCase):
 
 class TestNoteModel(TestCase):
 
-    def setUp(self):
+    def setUp (self):
         self.artist = Artist.objects.create(name='Test Artist')
-        self.venue = Venue.objects.create(name='Test Venue', city='Minneapolis', state='MN')
+        self.venue = Venue.objects.create( name='Test Venue', city='Minneapolis', state='MN')
         self.user = User.objects.create(username='testuser', email='test@example.com', first_name='Test', last_name='User')
+        self.show = Show.objects.create(artist=self.artist, venue=self.venue, show_date=timezone.now() - timedelta(days=1),
+                                        end_date=timezone.now() - timedelta(days=1) + timedelta(hours=1))
+
+    def test_user_cannot_create_two_notes_for_same_show(self):
+        Note.objects.create(show=self.show, user=self.user, title='first', text='first note')
+
+        with self.assertRaises(IntegrityError):
+           Note.objects.create(show=self.show, user=self.user, title='second', text='second note')
 
     def test_cannot_create_note_for_future_show(self):
         show = Show.objects.create(artist=self.artist, venue=self.venue, show_date=timezone.now() + timedelta(days=5), end_date=timezone.now() + timedelta(days=5, hours=2))
@@ -41,11 +48,11 @@ class TestNoteModel(TestCase):
 
 class TestShow(TestCase):
     # evaluate show creation conflicts
-    
+
     def setUp(self):  # django jargon
         self.artist1 = Artist.objects.create(name='Jichael Mackson')
         self.artist2 = Artist.objects.create(name='Saylor Twift')
-        
+
         self.venue1 = Venue.objects.create(name='First Venue', city='Minneapolis', state='MN')
         self.venue2 = Venue.objects.create(name='Second Venue', city='Sacramento', state='CA')
 

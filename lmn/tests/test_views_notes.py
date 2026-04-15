@@ -2,12 +2,14 @@ from django.test import TestCase
 from django.urls import reverse
 
 from django.contrib.auth.models import User
-from lmn.models import Note
+from lmn.models import Note, Show
 
 from django.utils import timezone
 from datetime import timedelta
 
 import datetime
+from datetime import timedelta
+from django.utils import timezone
 
 from lmn.models import  Show
 
@@ -36,28 +38,31 @@ class TestAddNotesWhenUserLoggedIn(TestCase):
         user = User.objects.first()
         self.client.force_login(user)
 
+        self.new_show = Show.objects.create( artist_id=1, venue_id=1, show_date=timezone.now() -timedelta(days=1),
+                                             end_date=timezone.now() - timedelta(days=1) + timedelta(hours=1))
+
     def test_save_note_for_non_existent_show_is_error(self):
-        new_note_url = reverse('new_note', kwargs={'show_pk': 100})
+        new_note_url = reverse('new_note', kwargs={'show_pk': 10000})
         response = self.client.post(new_note_url)
         self.assertEqual(response.status_code, 404)
 
     def test_can_save_new_note_for_show_blank_data_is_error(self):
         initial_note_count = Note.objects.count()
 
-        new_note_url = reverse('new_note', kwargs={'show_pk': 1})
+        new_note_url = reverse('new_note', kwargs={'show_pk': self.new_show.pk})
 
         # No post params
-        self.client.post(new_note_url, follow=True)
+        response=self.client.post(new_note_url, follow=True)
         # No note saved, should show same page
-        self.assertTemplateUsed('lmn/notes/new_note.html')
+        self.assertTemplateUsed(response,'lmn/notes/new_note.html')
 
         # no title
-        self.client.post(new_note_url, {'text': 'blah blah'}, follow=True)
-        self.assertTemplateUsed('lmn/notes/new_note.html')
+        response=self.client.post(new_note_url, {'text': 'blah blah'}, follow=True)
+        self.assertTemplateUsed(response,'lmn/notes/new_note.html')
 
         # no text
-        self.client.post(new_note_url, {'title': 'blah blah'}, follow=True)
-        self.assertTemplateUsed('lmn/notes/new_note.html')
+        response=self.client.post(new_note_url, {'title': 'blah blah'}, follow=True)
+        self.assertTemplateUsed(response,'lmn/notes/new_note.html')
 
         # nothing added to database
         # 2 test notes provided in fixture, should still be 2
@@ -66,7 +71,7 @@ class TestAddNotesWhenUserLoggedIn(TestCase):
     def test_add_note_database_updated_correctly(self):
         initial_note_count = Note.objects.count()
 
-        new_note_url = reverse('new_note', kwargs={'show_pk': 1})
+        new_note_url = reverse('new_note', kwargs={'show_pk': self.new_show.pk})
 
         self.client.post(
             new_note_url, 
@@ -74,7 +79,7 @@ class TestAddNotesWhenUserLoggedIn(TestCase):
             follow=True)
 
         # Verify note is in database
-        new_note_query = Note.objects.filter(text='ok', title='blah blah')
+        new_note_query = Note.objects.filter(text='ok', title='blah blah',show=self.new_show)
         self.assertEqual(new_note_query.count(), 1)
 
         # And one more note in DB than before
@@ -93,15 +98,24 @@ class TestAddNotesWhenUserLoggedIn(TestCase):
         self.assertAlmostEqual(now_timestamp, posted_timestamp, delta=ten_seconds) 
 
     def test_redirect_to_note_detail_after_save(self):
-        new_note_url = reverse('new_note', kwargs={'show_pk': 1})
+        new_note_url = reverse('new_note', kwargs={'show_pk': self.new_show.pk})
         response = self.client.post(
             new_note_url, 
             {'text': 'ok', 'title': 'blah blah'}, 
             follow=True)
 
-        new_note = Note.objects.filter(user=1, show=1, text='ok', title='blah blah').first()
+        new_note = Note.objects.filter(user=User.objects.first(), show=self.new_show, text='ok', title='blah blah').first()
 
         self.assertRedirects(response, reverse('note_detail', kwargs={'note_pk': new_note.pk}))
+
+    def test_user_cannot_add_second_note_for_same_show(self):
+     Note.objects.create(show=self.new_show, user=User.objects.first(), title='first', text='first note')
+
+     response = self.client.post(
+            reverse('new_note', kwargs={'show_pk': self.new_show.pk}), {'title': 'second', 'text': 'second note'})
+
+     self.assertEqual(response.status_code, 400)
+     self.assertEqual(Note.objects.filter(user= User.objects.first(), show=self.new_show).count(),1)
 
 
 class TestNotes(TestCase):
@@ -140,7 +154,10 @@ class TestNotes(TestCase):
 
         # Log someone in, add note
         self.client.force_login(User.objects.first())
-        response = self.client.get(reverse('new_note', kwargs={'show_pk': 1}))
+
+        show = Show.objects.create(artist_id=1,venue_id=1,show_date=timezone.now() - timedelta(days=1),
+                                   end_date=timezone.now() - timedelta(days=1) + timedelta(hours=1))
+        response = self.client.get(reverse('new_note', kwargs={'show_pk': show.pk}))
         self.assertTemplateUsed(response, 'lmn/notes/new_note.html')
 
 class TestFutureShowRestriction(TestCase):

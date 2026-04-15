@@ -97,6 +97,11 @@ class Note(models.Model):
         return f'User: {self.user} Show: {self.show} Note title: {self.title} \
         Text: {self.text} Posted on: {self.posted_date}'
 
+    class Meta:
+        constraints =[
+            models.UniqueConstraint(fields=['user', 'show'], name='unique_user_show_note')
+        ]
+
     def save(self, *args, **kwargs):
         '''
         Overrides save to verify that images are deleted from the media directory when they are deleted fromt the database
@@ -108,3 +113,4 @@ class Note(models.Model):
                 old_image.delete(save=False)
         else:
             super().save(*args, **kwargs)
+

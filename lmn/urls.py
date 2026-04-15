@@ -2,7 +2,7 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 from django.contrib import messages
 
-from .views import views_main, views_artists, views_venues, views_notes, views_users
+from .views import views_main, views_artists, views_venues, views_notes, views_users, views_shows
 
 class ConfirmLogoutView(auth_views.LogoutView):
     def dispatch(self, request, *args, **kwargs):
@@ -16,6 +16,9 @@ urlpatterns = [
     path('venues/list/', views_venues.venue_list, name='venue_list'),
     path('venues/detail/<int:venue_pk>/', views_venues.venue_detail, name='venue_detail'),
     path('venues/artists_at/<int:venue_pk>/', views_venues.artists_at_venue, name='artists_at_venue'),
+
+    # Show related URL
+    path('shows/list/', views_shows.show_list, name='show_list'),
 
     # Note related URLs
     path('notes/latest/', views_notes.latest_notes, name='latest_notes'),

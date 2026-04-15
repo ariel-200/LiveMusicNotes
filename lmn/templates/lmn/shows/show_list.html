@@ -1,0 +1,43 @@
+{% extends 'lmn/base.html' %}
+
+{% block content %}
+
+  <!-- Shows page.
+       Displays past and upcoming shows.
+       Past shows link to notes where users can read/add notes.
+       Upcoming shows are view-only. -->
+
+  <h2>Shows</h2>
+  <p>Browse past and upcoming shows. Click a past show to read notes or add your own.</p>
+
+  <!-- Past Shows Section -->
+  <h3>Past Shows</h3>
+
+  {% for show in past_shows %}
+    <div class="show">
+      <p>
+        <!-- Link to notes for this show -->
+        <a href="{% url 'notes_for_show' show_pk=show.pk %}">
+          {{ show.artist.name }} at {{ show.venue.name }} on {{ show.show_date }}
+        </a>
+      </p>
+    </div>
+  {% empty %}
+    <p>No past shows found.</p>
+  {% endfor %}
+
+  <!-- Upcoming Shows Section -->
+  <h3>Upcoming Shows</h3>
+
+  {% for show in upcoming_shows %}
+    <div class="show">
+      <p>
+        <!-- Upcoming shows do not link to notes -->
+        {{ show.artist.name }} at {{ show.venue.name }} on {{ show.show_date }}
+      </p>
+    </div>
+  {% empty %}
+    <p>No upcoming shows found.</p>
+  {% endfor %}
+
+{% endblock %}

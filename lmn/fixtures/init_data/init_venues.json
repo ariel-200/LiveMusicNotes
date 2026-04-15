@@ -1,0 +1,110 @@
+[
+  {
+    "model": "lmn.venue",
+    "pk": 1,
+    "fields": {
+      "name": "The Sapphire Lounge",
+      "city": "Seattle",
+      "state": "WA"
+    }
+  },
+  {
+    "model": "lmn.venue",
+    "pk": 2,
+    "fields": {
+      "name": "Rust Belt Arena",
+      "city": "Detroit",
+      "state": "MI"
+    }
+  },
+  {
+    "model": "lmn.venue",
+    "pk": 3,
+    "fields": {
+      "name": "Emerald Garden Amphitheater",
+      "city": "Portland",
+      "state": "OR"
+    }
+  },
+  {
+    "model": "lmn.venue",
+    "pk": 4,
+    "fields": {
+      "name": "The Gilded Ballroom",
+      "city": "New Orleans",
+      "state": "LA"
+    }
+  },
+  {
+    "model": "lmn.venue",
+    "pk": 5,
+    "fields": {
+      "name": "Sonic Peaks Stadium",
+      "city": "Denver",
+      "state": "CO"
+    }
+  },
+  {
+    "model": "lmn.venue",
+    "pk": 6,
+    "fields": {
+      "name": "Neon Heights Club",
+      "city": "Las Vegas",
+      "state": "NV"
+    }
+  },
+  {
+    "model": "lmn.venue",
+    "pk": 7,
+    "fields": {
+      "name": "Marble Arch Hall",
+      "city": "Austin",
+      "state": "TX"
+    }
+  },
+  {
+    "model": "lmn.venue",
+    "pk": 8,
+    "fields": {
+      "name": "The Foundry",
+      "city": "Pittsburgh",
+      "state": "PA"
+    }
+  },
+  {
+    "model": "lmn.venue",
+    "pk": 9,
+    "fields": {
+      "name": "Tidal Wave Pavilion",
+      "city": "San Diego",
+      "state": "CA"
+    }
+  },
+  {
+    "model": "lmn.venue",
+    "pk": 10,
+    "fields": {
+      "name": "Starlight Opera House",
+      "city": "Santa Fe",
+      "state": "NM"
+    }
+  },
+  {
+    "model": "lmn.venue",
+    "pk": 11,
+    "fields": {
+      "name": "The Brick & Mortar",
+      "city": "Chicago",
+      "state": "IL"
+    }
+  },
+  {
+    "model": "lmn.venue",
+    "pk": 12,
+    "fields": {
+      "name": "Echo Canyon Stage",
+      "city": "Phoenix",
+      "state": "AZ"
+    }
+  }
+]

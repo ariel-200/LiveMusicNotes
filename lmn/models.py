@@ -114,3 +114,23 @@ class Note(models.Model):
         else:
             super().save(*args, **kwargs)
 
+
+
+class Profile(models.Model):
+    # Link each profile to only one user
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    # Optional fields on the profile
+    bio = models.TextField(blank=True)
+    favorite_artist = models.CharField(max_length=200, blank=True)
+    favorite_genre = models.CharField(max_length=200, blank=True)
+    # Favorite show (linked to existing Show model)
+    # SET_NULL prevents errors if the show is deleted
+    favorite_show = models.ForeignKey(
+        Show,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s profile"

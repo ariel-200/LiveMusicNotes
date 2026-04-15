@@ -5,7 +5,7 @@ from django.contrib import auth
 from django.contrib.auth import authenticate
 
 from django.contrib.auth.models import User, AnonymousUser
-from lmn.models import Note
+from lmn.models import Note, Profile
 
 
 class TestUserProfile(TestCase):
@@ -36,10 +36,10 @@ class TestUserProfile(TestCase):
     def test_username_shown_on_profile_page(self):
         # A string "username's notes" is visible
         response = self.client.get(reverse('user_profile', kwargs={'user_pk': 1}))
-        self.assertContains(response, 'alice\'s notes')
+        self.assertContains(response, 'alice\'s profile')
 
         response = self.client.get(reverse('user_profile', kwargs={'user_pk': 2}))
-        self.assertContains(response, 'bob\'s notes')
+        self.assertContains(response, 'bob\'s profile')
 
     def test_correct_user_name_shown_different_profiles(self):
         logged_in_user = User.objects.get(pk=2)
@@ -53,6 +53,51 @@ class TestUserProfile(TestCase):
         response = self.client.get(reverse('user_profile', kwargs={'user_pk': 3}))
         self.assertContains(response, 'You are logged in,')
         self.assertContains(response, '<a href="/user/profile/2/">bob</a>.')
+
+    def test_edit_profile_requires_login(self):
+        """ Verify user must be logged in to edit profile """
+        response = self.client.get(reverse('edit_profile'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_logged_in_user_can_view_edit_profile(self):
+        """ Verify logged-in user can access edit profile page"""
+        user = User.objects.get(pk=2)
+        self.client.force_login(user)
+
+        response = self.client.get(reverse('edit_profile'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_user_can_update_profile(self):
+        """ Verify logged-in user can update profile info"""
+        user = User.objects.get(pk=2)
+        self.client.force_login(user)
+
+        self.client.post(reverse('edit_profile'), {
+            'bio': 'I love music!',
+            'favorite_artist': 'Bob',
+            'favorite_genre': 'Pop',
+            'favorite_show': ''
+        })
+
+        profile = Profile.objects.get(user=user)
+
+        self.assertEqual(profile.bio, 'I love music!')
+        self.assertEqual(profile.favorite_artist, 'Bob')
+        self.assertEqual(profile.favorite_genre, 'Pop')
+
+    def test_edit_profile_link_only_on_own_profile(self):
+        """ Verify edit profile link only appears on user's own profile """
+
+        user = User.objects.get(pk=2)
+        self.client.force_login(user)
+
+        # Viewing own profile, should see Edit Profile
+        response = self.client.get(reverse('user_profile', kwargs={'user_pk': 2}))
+        self.assertContains(response, 'Edit Profile')
+
+        # Viewing another user's profile, should NOT see Edit Profile
+        response = self.client.get(reverse('user_profile', kwargs={'user_pk': 1}))
+        self.assertNotContains(response, 'Edit Profile')
 
 
 class TestUserAuthentication(TestCase):

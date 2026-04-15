@@ -1,0 +1,63 @@
+from django.test import TestCase
+from django.urls import reverse
+
+from django.utils import timezone
+from datetime import timedelta
+from lmn.models import Show, Artist, Venue
+
+class TestShowListView(TestCase):
+    """ Tests for the shows page """
+
+    def setUp(self):
+        self.artist = Artist.objects.create(name='Test Artist')
+        self.venue = Venue.objects.create(
+            name='Test Venue',
+            city='Minneapolis',
+            state='MN'
+        )
+
+        # Create one past show
+        self.past_show = Show.objects.create(
+            artist=self.artist,
+            venue=self.venue,
+            show_date=timezone.now() - timedelta(days=2),
+            end_date=timezone.now() - timedelta(days=2) + timedelta(hours=2)
+        )
+
+        # Create one upcoming show
+        self.upcoming_show = Show.objects.create(
+            artist=self.artist,
+            venue=self.venue,
+            show_date=timezone.now() + timedelta(days=2),
+            end_date=timezone.now() + timedelta(days=2) + timedelta(hours=2)
+        )
+
+    def test_show_list_page_loads(self):
+        """ Verify shows page loads successfully """
+        response = self.client.get(reverse('show_list'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_show_list_uses_correct_template(self):
+        """ Verify correct template is used for shows page """
+        response = self.client.get(reverse('show_list'))
+        self.assertTemplateUsed(response, 'lmn/shows/show_list.html')
+
+    def test_past_and_upcoming_sections_display(self):
+        """ Verify past and upcoming show sections appear """
+        response = self.client.get(reverse('show_list'))
+        self.assertContains(response, 'Past Shows')
+        self.assertContains(response, 'Upcoming Shows')
+
+    def test_past_and_upcoming_shows_display(self):
+        """ Verify both past and upcoming shows appear on the page """
+        response = self.client.get(reverse('show_list'))
+        self.assertContains(response, self.past_show.artist.name)
+        self.assertContains(response, self.upcoming_show.artist.name)
+
+    def test_past_show_links_to_notes_page(self):
+        """ Verify past shows link to the notes page """
+        response = self.client.get(reverse('show_list'))
+        self.assertContains(
+            response,
+            reverse('notes_for_show', kwargs={'show_pk': self.past_show.pk})
+        )

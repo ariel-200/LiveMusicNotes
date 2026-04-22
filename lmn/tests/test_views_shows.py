@@ -54,6 +54,69 @@ class TestShowListView(TestCase):
         self.assertContains(response, self.past_show.artist.name)
         self.assertContains(response, self.upcoming_show.artist.name)
 
+    def test_shows_are_ordered_correctly(self):
+        """ Verify past shows are newest first and upcoming shows are soonest first """
+        now = timezone.now()
+
+        venue = Venue.objects.create(
+            name='Order Venue',
+            city='Minneapolis',
+            state='MN'
+        )
+
+        # Create artists with unique names for easy ordering checks
+        past_old_artist = Artist.objects.create(name='Past Old')
+        past_new_artist = Artist.objects.create(name='Past New')
+        future_soon_artist = Artist.objects.create(name='Future Soon')
+        future_late_artist = Artist.objects.create(name='Future Late')
+
+        # Older past show
+        Show.objects.create(
+            artist=past_old_artist,
+            venue=venue,
+            show_date=now - timedelta(days=5),
+            end_date=now - timedelta(days=5) + timedelta(hours=2)
+        )
+
+        # More recent past show
+        Show.objects.create(
+            artist=past_new_artist,
+            venue=venue,
+            show_date=now - timedelta(days=1),
+            end_date=now - timedelta(days=1) + timedelta(hours=2)
+        )
+
+        # Later upcoming show
+        Show.objects.create(
+            artist=future_late_artist,
+            venue=venue,
+            show_date=now + timedelta(days=5),
+            end_date=now + timedelta(days=5) + timedelta(hours=2)
+        )
+
+        # Sooner upcoming show
+        Show.objects.create(
+            artist=future_soon_artist,
+            venue=venue,
+            show_date=now + timedelta(days=1),
+            end_date=now + timedelta(days=1) + timedelta(hours=2)
+        )
+
+        response = self.client.get(reverse('show_list'))
+        content = response.content.decode()
+
+        # Past shows should show most recent first
+        self.assertLess(
+            content.index('Past New'),
+            content.index('Past Old')
+        )
+
+        # Upcoming shows should show soonest first
+        self.assertLess(
+            content.index('Future Soon'),
+            content.index('Future Late')
+        )
+
     def test_past_show_links_to_notes_page(self):
         """ Verify past shows link to the notes page """
         response = self.client.get(reverse('show_list'))

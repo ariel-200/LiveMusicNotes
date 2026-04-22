@@ -7,7 +7,7 @@
       "user":"1",
       "title":"ok",
       "text":"kinda ok",
-      "posted_date":"2018-02-12T21:45:00-06:00"
+      "posted_date":"2018-02-12T21:45:00-06:00",
       "rating": 3
     }
   },
@@ -19,7 +19,7 @@
       "user":"2",
       "title":"awesome",
       "text":"yay!",
-      "posted_date":"2018-02-13T09:45:00-06:00"
+      "posted_date":"2018-02-13T09:45:00-06:00",
       "rating": 4
     }
   },
@@ -31,7 +31,7 @@
       "user":"2",
       "title":"super",
       "text":"woo hoo!",
-      "posted_date":"2018-02-14T14:15:00-06:00"
+      "posted_date":"2018-02-14T14:15:00-06:00",
       "rating": 5
     }
   }

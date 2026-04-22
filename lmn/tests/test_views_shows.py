@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+from unittest.mock import patch
 
 from django.utils import timezone
 from datetime import timedelta
@@ -117,34 +118,6 @@ class TestShowListView(TestCase):
             content.index('Future Late')
         )
 
-    def test_show_starting_now_is_in_past_shows(self):
-        """ Verify a show starting now is treated as a past show """
-
-        artist = Artist.objects.create(name='Now Artist')
-        venue = Venue.objects.create(
-            name='Now Venue',
-            city='Minneapolis',
-            state='MN'
-        )
-
-        now = timezone.now()
-
-        # Create show that starts at the current time
-        show = Show.objects.create(
-            artist=artist,
-            venue=venue,
-            show_date=now,
-            end_date=now + timedelta(hours=2)
-        )
-
-        response = self.client.get(reverse('show_list'))
-
-        # Show should be included in past_shows
-        self.assertIn(show, response.context['past_shows'])
-
-        # Show should not be included in upcoming_shows
-        self.assertNotIn(show, response.context['upcoming_shows'])
-
     def test_past_show_links_to_notes_page(self):
         """ Verify past shows link to the notes page """
         response = self.client.get(reverse('show_list'))
@@ -152,3 +125,39 @@ class TestShowListView(TestCase):
             response,
             reverse('notes_for_show', kwargs={'show_pk': self.past_show.pk})
         )
+
+
+class TestCurrentTimeShowView(TestCase):
+    """ Tests for shows starting at the current time """
+
+    def setUp(self):
+        # Save one fixed point in time for the test
+        self.mock_time = timezone.now()
+
+        self.artist = Artist.objects.create(name='Test Artist')
+        self.venue = Venue.objects.create(
+            name='Test Venue',
+            city='Minneapolis',
+            state='MN'
+        )
+
+        # Create show that starts at the current time
+        self.current_show = Show.objects.create(
+            artist=self.artist,
+            venue=self.venue,
+            show_date=self.mock_time,
+            end_date=self.mock_time + timedelta(hours=2)
+        )
+
+    def test_show_at_current_time_is_past_show(self):
+        """ Verify show at current time is included in past shows """
+        with patch('django.utils.timezone.now', return_value=self.mock_time):
+            response = self.client.get(reverse('show_list'))
+
+            # Get shows sent to the template
+            past_shows = response.context['past_shows']
+            upcoming_shows = response.context['upcoming_shows']
+
+            # Show should be treated as a past show
+            self.assertIn(self.current_show, past_shows)
+            self.assertNotIn(self.current_show, upcoming_shows)

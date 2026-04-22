@@ -8,6 +8,7 @@
 
   <p id="note-title"><b>{{ note.title}}</b></p>
   <p id="note-text">{{ note.text }}</p>
+  <p id="note-rating">{{ note.rating }}</p>
   {% if note.image %}
   <img class="note-image" src="{{ note.image.url }}" alt="Note image for {{ note.title }}" width="50%" height="auto">
   {% endif %}

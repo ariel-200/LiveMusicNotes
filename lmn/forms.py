@@ -17,7 +17,7 @@ class ArtistSearchForm(forms.Form):
 class NewNoteForm(forms.ModelForm):
     class Meta:
         model = Note
-        fields = ('title', 'text', 'image')
+        fields = ('title', 'text', 'image', 'rating')
 
 
 class UserRegistrationForm(UserCreationForm):

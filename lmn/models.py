@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 
 # Remember that every model gets a primary key field by default.
@@ -83,6 +84,12 @@ class Note(models.Model):
     text = models.TextField(max_length=1000, blank=False)
     posted_date = models.DateTimeField(auto_now_add=True, blank=False)
     image = models.ImageField(upload_to='images/', blank=True, null=True)
+    rating = models.PositiveSmallIntegerField(
+    validators=[
+        MinValueValidator(1),
+        MaxValueValidator(5)
+    ]
+)
 
     def clean(self):
         super().clean()

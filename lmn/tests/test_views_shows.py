@@ -118,6 +118,22 @@ class TestShowListView(TestCase):
             content.index('Future Late')
         )
 
+    def test_past_and_upcoming_shows_are_in_correct_context(self):
+        """ Verify past and upcoming shows are placed in the correct context """
+
+        response = self.client.get(reverse('show_list'))
+
+        past_shows = response.context['past_shows']
+        upcoming_shows = response.context['upcoming_shows']
+
+        # Past show should be in past_shows only
+        self.assertIn(self.past_show, past_shows)
+        self.assertNotIn(self.past_show, upcoming_shows)
+
+        # Upcoming show should be in upcoming_shows only
+        self.assertIn(self.upcoming_show, upcoming_shows)
+        self.assertNotIn(self.upcoming_show, past_shows)
+
     def test_past_show_links_to_notes_page(self):
         """ Verify past shows link to the notes page """
         response = self.client.get(reverse('show_list'))
@@ -151,7 +167,7 @@ class TestCurrentTimeShowView(TestCase):
 
     def test_show_at_current_time_is_past_show(self):
         """ Verify show at current time is included in past shows """
-        with patch('django.utils.timezone.now', return_value=self.mock_time):
+        with patch('lmn.views.views_shows.timezone.now', return_value=self.mock_time):
             response = self.client.get(reverse('show_list'))
 
             # Get shows sent to the template

@@ -86,7 +86,7 @@ class Note(models.Model):
     image = models.ImageField(upload_to='images/', blank=True, null=True)
     rating = models.PositiveSmallIntegerField(
     validators=[
-        MinValueValidator(1),
+        MinValueValidator(0),
         MaxValueValidator(5)
     ]
 )

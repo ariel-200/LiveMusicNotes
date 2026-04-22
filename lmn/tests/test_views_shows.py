@@ -117,6 +117,34 @@ class TestShowListView(TestCase):
             content.index('Future Late')
         )
 
+    def test_show_starting_now_is_in_past_shows(self):
+        """ Verify a show starting now is treated as a past show """
+
+        artist = Artist.objects.create(name='Now Artist')
+        venue = Venue.objects.create(
+            name='Now Venue',
+            city='Minneapolis',
+            state='MN'
+        )
+
+        now = timezone.now()
+
+        # Create show that starts at the current time
+        show = Show.objects.create(
+            artist=artist,
+            venue=venue,
+            show_date=now,
+            end_date=now + timedelta(hours=2)
+        )
+
+        response = self.client.get(reverse('show_list'))
+
+        # Show should be included in past_shows
+        self.assertIn(show, response.context['past_shows'])
+
+        # Show should not be included in upcoming_shows
+        self.assertNotIn(show, response.context['upcoming_shows'])
+
     def test_past_show_links_to_notes_page(self):
         """ Verify past shows link to the notes page """
         response = self.client.get(reverse('show_list'))

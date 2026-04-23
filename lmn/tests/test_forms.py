@@ -50,7 +50,7 @@ class NewNoteFormTests(TestCase):
         self.assertFalse(form.is_valid())
 
     def test_ok_title_and_length_is_valid(self):
-        form_data = {'title': 'blah blah', 'text': 'blah, blah, blah.'}
+        form_data = {'title': 'blah blah', 'text': 'blah, blah, blah.', 'rating': 3}
         form = NewNoteForm(form_data)
         self.assertTrue(form.is_valid())
 
@@ -61,7 +61,7 @@ class NoteImageFormTests(TestCase):
         """
         Ensure the blank and null field parameters are respected 
         """
-        form_data = {'title': 'Good show', 'text': 'We had a good time.'}
+        form_data = {'title': 'Good show', 'text': 'We had a good time.', 'rating': 3}
         form = NewNoteForm(form_data)
         self.assertTrue(form.is_valid())
 

@@ -101,8 +101,7 @@ class Note(models.Model):
             raise ValidationError('Cannot add notes for future shows.')
 
     def __str__(self):
-        return f'User: {self.user} Show: {self.show} Note title: {self.title} \
-        Text: {self.text} Posted on: {self.posted_date}'
+        return f'User: {self.user} Show: {self.show} Note title: {self.title} Text: {self.text} Rating: {self.rating} Posted on: {self.posted_date}'
 
     class Meta:
         constraints =[

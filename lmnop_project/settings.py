@@ -105,7 +105,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # LLM API Key and Config
 
-GEMINI_API_KEY = env("GEMINI_API_KEY")
+GEMINI_API_KEY = env("GEMINI_API_KEY", default=None)
 GEMINI_MODEL = "gemini-2.5-flash"
 
 # Internationalization

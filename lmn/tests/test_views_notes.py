@@ -74,12 +74,12 @@ class TestAddNotesWhenUserLoggedIn(TestCase):
         new_note_url = reverse('new_note', kwargs={'show_pk': self.new_show.pk})
 
         self.client.post(
-            new_note_url, 
-            {'text': 'ok', 'title': 'blah blah'}, 
+            new_note_url,
+            {'text': 'I really enjoyed this concert', 'title': 'Great concert'},
             follow=True)
 
         # Verify note is in database
-        new_note_query = Note.objects.filter(text='ok', title='blah blah',show=self.new_show)
+        new_note_query = Note.objects.filter(text='I really enjoyed this concert', title='Great concert', show=self.new_show)
         self.assertEqual(new_note_query.count(), 1)
 
         # And one more note in DB than before
@@ -100,11 +100,11 @@ class TestAddNotesWhenUserLoggedIn(TestCase):
     def test_redirect_to_note_detail_after_save(self):
         new_note_url = reverse('new_note', kwargs={'show_pk': self.new_show.pk})
         response = self.client.post(
-            new_note_url, 
-            {'text': 'ok', 'title': 'blah blah'}, 
+            new_note_url,
+            {'text': 'I really enjoyed this concert', 'title': 'Great concert'},
             follow=True)
 
-        new_note = Note.objects.filter(user=User.objects.first(), show=self.new_show, text='ok', title='blah blah').first()
+        new_note = Note.objects.filter(user=User.objects.first(), show=self.new_show, text='I really enjoyed this concert', title='Great concert').first()
 
         self.assertRedirects(response, reverse('note_detail', kwargs={'note_pk': new_note.pk}))
 

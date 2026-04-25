@@ -106,7 +106,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # LLM API Key and Config
 
 GEMINI_API_KEY = env("GEMINI_API_KEY")
-GEMINI_MODEL = "gemini-1.5-flash"
+GEMINI_MODEL = "gemini-2.5-flash"
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/

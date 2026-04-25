@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from .services.spam_filter import is_spam
 
 # Remember that every model gets a primary key field by default.
 
@@ -92,6 +93,8 @@ class Note(models.Model):
 
         if self.show and self.show.show_date > timezone.now():
             raise ValidationError('Cannot add notes for future shows.')
+        if is_spam(self.title or '', self.text or ''):
+            raise ValidationError("This note was flagged as spam and could not be saved.")
 
     def __str__(self):
         return f'User: {self.user} Show: {self.show} Note title: {self.title} \
@@ -113,7 +116,6 @@ class Note(models.Model):
                 old_image.delete(save=False)
         else:
             super().save(*args, **kwargs)
-
 
 
 class Profile(models.Model):

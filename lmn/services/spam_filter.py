@@ -8,7 +8,7 @@ SPAM_SYSTEM_INSTRUCTIONS = """
     Reply with only: SPAM or NOT_SPAM
     """
 
-def spam_filter(title, text):
+def is_spam(title, text):
     """
     Will return true if the response is determined to be spam.
     """

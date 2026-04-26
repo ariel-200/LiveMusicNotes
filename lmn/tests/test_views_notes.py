@@ -13,6 +13,8 @@ from django.utils import timezone
 
 from lmn.models import  Show
 
+from unittest.mock import patch
+
 
 class TestNoNotesViews(TestCase):
 
@@ -68,7 +70,8 @@ class TestAddNotesWhenUserLoggedIn(TestCase):
         # 2 test notes provided in fixture, should still be 2
         self.assertEqual(Note.objects.count(), initial_note_count)   
 
-    def test_add_note_database_updated_correctly(self):
+    @patch('lmn.models.is_spam', return_value=False) #Patch to prevent LLM API call
+    def test_add_note_database_updated_correctly(self, mock_is_spam):
         initial_note_count = Note.objects.count()
 
         new_note_url = reverse('new_note', kwargs={'show_pk': self.new_show.pk})
@@ -97,7 +100,8 @@ class TestAddNotesWhenUserLoggedIn(TestCase):
         ten_seconds = 10 * 1000
         self.assertAlmostEqual(now_timestamp, posted_timestamp, delta=ten_seconds) 
 
-    def test_redirect_to_note_detail_after_save(self):
+    @patch('lmn.models.is_spam', return_value=False)
+    def test_redirect_to_note_detail_after_save(self, mock_is_spam):
         new_note_url = reverse('new_note', kwargs={'show_pk': self.new_show.pk})
         response = self.client.post(
             new_note_url,

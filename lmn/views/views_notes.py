@@ -2,6 +2,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
+from django.core.exceptions import ValidationError
 
 import os
 from django.conf import settings
@@ -36,9 +37,12 @@ def new_note(request, show_pk):
             note = form.save(commit=False)
             note.user = request.user
             note.show = show
-            note.full_clean()
-            note.save()
-            return redirect('note_detail', note_pk=note.pk)
+            try:
+                note.full_clean()
+                note.save()
+                return redirect('note_detail', note_pk=note.pk)
+            except ValidationError as e:
+                form.add_error(None, e)
     else:
         form = NewNoteForm()
 

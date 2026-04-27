@@ -85,11 +85,11 @@ class Note(models.Model):
     posted_date = models.DateTimeField(auto_now_add=True, blank=False)
     image = models.ImageField(upload_to='images/', blank=True, null=True)
     rating = models.PositiveSmallIntegerField(
-    validators=[
-        MinValueValidator(0),
-        MaxValueValidator(5)
-    ]
-)
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(5)
+        ]
+    )
 
     def clean(self):
         super().clean()
@@ -99,6 +99,8 @@ class Note(models.Model):
 
         if self.show and self.show.show_date > timezone.now():
             raise ValidationError('Cannot add notes for future shows.')
+
+
 
     def __str__(self):
         return f'User: {self.user} Show: {self.show} Note title: {self.title} Text: {self.text} Rating: {self.rating} Posted on: {self.posted_date}'
@@ -119,6 +121,8 @@ class Note(models.Model):
                 old_image.delete(save=False)
         else:
             super().save(*args, **kwargs)
+        
+        self.full_clean()
 
 
 

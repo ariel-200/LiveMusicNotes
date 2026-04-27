@@ -75,7 +75,7 @@ class TestAddNotesWhenUserLoggedIn(TestCase):
 
         self.client.post(
             new_note_url, 
-            {'text': 'ok', 'title': 'blah blah'}, 
+            {'text': 'ok', 'title': 'blah blah', 'rating': 1}, 
             follow=True)
 
         # Verify note is in database
@@ -101,7 +101,7 @@ class TestAddNotesWhenUserLoggedIn(TestCase):
         new_note_url = reverse('new_note', kwargs={'show_pk': self.new_show.pk})
         response = self.client.post(
             new_note_url, 
-            {'text': 'ok', 'title': 'blah blah'}, 
+            {'text': 'ok', 'title': 'blah blah', 'rating': 1}, 
             follow=True)
 
         new_note = Note.objects.filter(user=User.objects.first(), show=self.new_show, text='ok', title='blah blah').first()
@@ -109,7 +109,7 @@ class TestAddNotesWhenUserLoggedIn(TestCase):
         self.assertRedirects(response, reverse('note_detail', kwargs={'note_pk': new_note.pk}))
 
     def test_user_cannot_add_second_note_for_same_show(self):
-     Note.objects.create(show=self.new_show, user=User.objects.first(), title='first', text='first note')
+     Note.objects.create(show=self.new_show, user=User.objects.first(), title='first', text='first note', rating=1)
 
      response = self.client.post(
             reverse('new_note', kwargs={'show_pk': self.new_show.pk}), {'title': 'second', 'text': 'second note'})
@@ -155,8 +155,7 @@ class TestNotes(TestCase):
         # Log someone in, add note
         self.client.force_login(User.objects.first())
 
-        show = Show.objects.create(artist_id=1,venue_id=1,show_date=timezone.now() - timedelta(days=1),
-                                   end_date=timezone.now() - timedelta(days=1) + timedelta(hours=1))
+        show = Show.objects.create(artist_id=1,venue_id=1,show_date=timezone.now() - timedelta(days=1), end_date=timezone.now() - timedelta(days=1) + timedelta(hours=1))
         response = self.client.get(reverse('new_note', kwargs={'show_pk': show.pk}))
         self.assertTemplateUsed(response, 'lmn/notes/new_note.html')
 

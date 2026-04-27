@@ -35,10 +35,10 @@ class TestNoteModel(TestCase):
                                         end_date=timezone.now() - timedelta(days=1) + timedelta(hours=1))
 
     def test_user_cannot_create_two_notes_for_same_show(self):
-        Note.objects.create(show=self.show, user=self.user, title='first', text='first note')
+        Note.objects.create(show=self.show, user=self.user, title='first', text='first note', rating=1)
 
         with self.assertRaises(IntegrityError):
-           Note.objects.create(show=self.show, user=self.user, title='second', text='second note')
+           Note.objects.create(show=self.show, user=self.user, title='second', text='second note', rating=1)
 
     def test_cannot_create_note_for_future_show(self):
         show = Show.objects.create(artist=self.artist, venue=self.venue, show_date=timezone.now() + timedelta(days=5), end_date=timezone.now() + timedelta(days=5, hours=2))

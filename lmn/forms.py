@@ -13,6 +13,8 @@ class VenueSearchForm(forms.Form):
 class ArtistSearchForm(forms.Form):
     search_name = forms.CharField(label='Artist Name', max_length=200)
 
+class NoteSearchForm(forms.Form):
+    search_text = forms.CharField(label='NoteDetail', max_length=200)
 
 class NewNoteForm(forms.ModelForm):
     class Meta:

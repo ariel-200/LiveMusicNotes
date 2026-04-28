@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 
-from ..forms import UserRegistrationForm, ProfileForm
+from ..forms import NoteSearchForm, UserRegistrationForm, ProfileForm
 from ..models import Note, Profile
 
 
@@ -12,12 +12,30 @@ def user_profile(request, user_pk):
     """ Get user profile for any user on the site. 
     Any user may view any other user's profile. 
     """
+    
+    """
+    TODO
+    1. create form instance
+    2. GET search string from template's form instance (passed by view)
+    3. if search string exists, filter list of instances of notes that match search string and contextualize; if not, contextualize list of all instances
+    4. contextualize user_pk iot fetch right template + action url
+    """
+
     user = User.objects.get(pk=user_pk)
-    usernotes = Note.objects.filter(user=user.pk).order_by('-posted_date')
+
+    form = NoteSearchForm()
+    search_text = request.GET.get('search_text')  # template form
+    if search_text:
+        notes1 = Note.objects.filter(user=user.pk, text__icontains=search_text).order_by('-posted_date')
+        notes2 = Note.objects.filter(user=user.pk, title__icontains=search_text).order_by('-posted_date')
+        notes = notes1 | notes2
+    else:
+        notes = Note.objects.filter(user=user.pk).order_by('-posted_date')
 
     # Get profile if it exists
     profile = Profile.objects.filter(user=user).first()
-    return render(request, 'lmn/users/user_profile.html', {'user_profile': user, 'notes': usernotes, 'profile': profile})
+
+    return render(request, 'lmn/users/user_profile.html', {'user_profile': user, 'notes': notes , 'profile': profile, 'search_text': search_text, 'form': form})
 
 
 @login_required

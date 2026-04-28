@@ -48,10 +48,20 @@
 
     <div>
         <h2 id="username-notes">Notes</h2>
+        <p>Search {{ user_profile.username }}'s Notes:</p>
         <form action="{% url 'user_profile' user_pk=user_profile.pk%}">
             {{ form }}
             <input type="submit" value="Search">
         </form>
+    </div>
+
+    <div>
+        {% if search_text %}
+        <h3>
+            Notes with titles or text matching '{{ search_text }}'
+            <a href="{% url 'user_profile' user_pk=user_profile.pk%}">(clear)</a>
+        </h3>
+        {% endif %}
     </div>
 
   {% for note in notes %}

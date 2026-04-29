@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from django.contrib.auth.models import User
-from lmn.models import Note, Show
+from lmn.models import Note, Show, Artist, Venue
 
 from django.utils import timezone
 from datetime import timedelta
@@ -19,6 +19,23 @@ class TestNoNotesViews(TestCase):
     def test_note_list_with_no_notes_returns_empty_list(self):
         response = self.client.get(reverse('latest_notes'))
         self.assertFalse(response.context['notes'])  # An empty list is false
+
+    def test_add_note_link_shown_for_past_show_when_user_has_no_note(self):
+        user= User.objects.create_user(username='testuser', password='testpass1')
+        self.client.force_login(user)
+
+        artist= Artist.objects.create(name='Test artist')
+        venue= Venue.objects.create(name='Test venue')
+
+        past_show= Show.objects.create(
+            artist_id=1,
+            venue_id=1,
+            show_date=timezone.now() - timedelta(days=2),
+            end_date=timezone.now() - timedelta(days=2) + timedelta(hours=2),
+        )
+        response = self.client.get(reverse('notes_for_show', kwargs={'show_pk': past_show.pk}))
+
+        self.assertContains(response,'Add your own notes for this show')
 
 
 class TestAddNoteUnauthentictedUser(TestCase):

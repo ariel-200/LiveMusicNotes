@@ -177,3 +177,80 @@ class TestCurrentTimeShowView(TestCase):
             # Show should be treated as a past show
             self.assertIn(self.current_show, past_shows)
             self.assertNotIn(self.current_show, upcoming_shows)
+
+
+class TestShowSearchView(TestCase):
+    """ Tests for shows page search functionality """
+
+    def setUp(self):
+        self.matching_artist = Artist.objects.create(name='Search Artist')
+        self.matching_venue = Venue.objects.create(
+            name='Search Venue',
+            city='Minneapolis',
+            state='MN'
+        )
+
+        self.other_artist = Artist.objects.create(name='Other Artist')
+        self.other_venue = Venue.objects.create(
+            name='Other Venue',
+            city='St Paul',
+            state='MN'
+        )
+
+        # Show that should match artist searches
+        self.artist_match_show = Show.objects.create(
+            artist=self.matching_artist,
+            venue=self.other_venue,
+            show_date=timezone.now() - timedelta(days=1),
+            end_date=timezone.now() - timedelta(days=1) + timedelta(hours=2)
+        )
+
+        # Show that should match venue searches
+        self.venue_match_show = Show.objects.create(
+            artist=self.other_artist,
+            venue=self.matching_venue,
+            show_date=timezone.now() - timedelta(days=1),
+            end_date=timezone.now() - timedelta(days=1) + timedelta(hours=2)
+        )
+
+        # Show that should not match search
+        self.non_matching_show = Show.objects.create(
+            artist=self.other_artist,
+            venue=self.other_venue,
+            show_date=timezone.now() - timedelta(days=2),
+            end_date=timezone.now() - timedelta(days=2) + timedelta(hours=2)
+        )
+
+    def test_search_finds_artist_name(self):
+        """ Verify search finds shows by artist name """
+        response = self.client.get(reverse('show_list'), {'search_name': 'Search Artist'})
+
+        self.assertContains(response, self.artist_match_show.artist.name)
+        self.assertNotContains(response, self.non_matching_show.artist.name)
+
+    def test_search_finds_venue_name(self):
+        """ Verify search finds shows by venue name """
+        response = self.client.get(reverse('show_list'), {'search_name': 'Search Venue'})
+
+        self.assertContains(response, self.venue_match_show.venue.name)
+        self.assertNotContains(response, self.non_matching_show.venue.name)
+
+    def test_search_is_case_insensitive(self):
+        """ Verify search is not case-sensitive """
+        response = self.client.get(reverse('show_list'), {'search_name': 'search artist'})
+
+        self.assertContains(response, self.artist_match_show.artist.name)
+
+    def test_search_term_is_sent_to_template(self):
+        """ Verify search term is available to the template """
+        response = self.client.get(reverse('show_list'), {'search_name': 'Search Artist'})
+
+        self.assertEqual(response.context['search_term'], 'Search Artist')
+
+    def test_empty_search_shows_all_results(self):
+        """ Verify empty search does not filter shows """
+        response = self.client.get(reverse('show_list'), {'search_name': ''})
+
+        self.assertContains(response, self.artist_match_show.artist.name)
+        self.assertContains(response, self.venue_match_show.venue.name)
+        self.assertContains(response, self.non_matching_show.artist.name)

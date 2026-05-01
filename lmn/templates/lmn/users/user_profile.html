@@ -48,7 +48,7 @@
 
     <div>
         <h2 id="username-notes">Notes</h2>
-        <p>Search {{ user_profile.username }}'s Notes:</p>
+        <p>Search {{ user_profile.username }}'s Notes (title/text):</p>
         <form action="{% url 'user_profile' user_pk=user_profile.pk%}">
             {{ form }}
             <input type="submit" value="Search">

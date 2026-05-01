@@ -54,6 +54,25 @@ class NewNoteFormTests(TestCase):
         form = NewNoteForm(form_data)
         self.assertTrue(form.is_valid())
 
+    def test_note_rating_over_five_is_invalid(self):
+        form_data = {'title': 'blah blah', 'text': 'blah, blah, blah.', 'rating': 10}
+        form = NewNoteForm(form_data)
+        self.assertFalse(form.is_valid(), "rating over five should be invalid form")
+
+    def test_note_rating_under_zero_is_invalid(self):
+        form_data = {'title': 'blah blah', 'text': 'blah, blah, blah.', 'rating': -1}
+        form = NewNoteForm(form_data)
+        self.assertFalse(form.is_valid(), "negative rating should be invalid form")
+
+    def test_note_rating_zero_is_valid(self):
+        form_data = {'title': 'blah blah', 'text': 'blah, blah, blah.', 'rating': 0}
+        form = NewNoteForm(form_data)
+        self.assertTrue(form.is_valid(), "zero rating should be valid form")
+
+    def test_note_rating_non_number_is_invalid(self):
+        form_data = {'title': 'blah blah', 'text': 'blah, blah, blah.', 'rating': 'example'}
+        form = NewNoteForm(form_data)
+        self.assertFalse(form.is_valid(), "non-number rating should be invalid form")
 
 class NoteImageFormTests(TestCase):
 

@@ -4,7 +4,7 @@
 
   <!-- Homepage introducing the app and how to use it -->
 
-  <p>Welcome to Live Music Notes (LMN)</p>
+  <h2>Welcome to Live Music Notes (LMN)</h2>
 
   <p>
     Browse artists, venues, and shows to explore live music events.
@@ -17,5 +17,39 @@
   <p>
       Use the navigation links above (Artists, Venues, Shows, and Notes) to explore the app.
   </p>
+
+    <!-- Recent Shows Section-->
+    <h3>Recent Shows</h3>
+
+    {% if recent_shows %}
+    <ul>
+      {% for show in recent_shows %}
+        <li>
+          {{ show.artist.name }} at {{ show.venue.name }} ({{ show.show_date|date:"M d, Y" }})
+          -
+          <a href="{% url 'notes_for_show' show.pk %}">View Notes</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No recent shows available.</p>
+  {% endif %}
+
+
+  <!-- Latest Notes Section -->
+  <h3>Latest Notes</h3>
+
+  {% if latest_notes %}
+    <ul>
+      {% for note in latest_notes %}
+        <li>
+          <a href="{% url 'note_detail' note.pk %}">{{ note.title }}</a>
+          for {{ note.show.artist.name }} at {{ note.show.venue.name }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No notes available.</p>
+  {% endif %}
 
 {% endblock %}

@@ -13,14 +13,6 @@ def user_profile(request, user_pk):
     Any user may view any other user's profile. 
     """
     
-    """
-    TODO
-    1. create form instance
-    2. GET search string from template's form instance (passed by view)
-    3. if search string exists, filter list of instances of notes that match search string and contextualize; if not, contextualize list of all instances
-    4. contextualize user_pk iot fetch right template + action url
-    """
-
     user = User.objects.get(pk=user_pk)
 
     form = NoteSearchForm()

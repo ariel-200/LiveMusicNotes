@@ -58,7 +58,7 @@
     <div>
         {% if search_text %}
         <h3>
-            Notes with titles or text matching '{{ search_text }}'
+            Notes matching '{{ search_text }}'
             <a href="{% url 'user_profile' user_pk=user_profile.pk%}">(clear)</a>
         </h3>
         {% endif %}

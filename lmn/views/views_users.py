@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
+from django.db.models import Q
 
 from ..forms import NoteSearchForm, UserRegistrationForm, ProfileForm
 from ..models import Note, Profile
@@ -18,9 +19,16 @@ def user_profile(request, user_pk):
     form = NoteSearchForm()
     search_text = request.GET.get('search_text')  # template form
     if search_text:
-        notes1 = Note.objects.filter(user=user.pk, text__icontains=search_text).order_by('-posted_date')
-        notes2 = Note.objects.filter(user=user.pk, title__icontains=search_text).order_by('-posted_date')
-        notes = notes1 | notes2
+
+        notes = Note.objects.filter(
+            Q(user=user.pk) &
+            (
+                Q(text__icontains=search_text) |
+                Q(title__icontains=search_text) |
+                Q(show__artist__name__icontains=search_text) |
+                Q(show__venue__name__icontains=search_text)
+            )
+        )
     else:
         notes = Note.objects.filter(user=user.pk).order_by('-posted_date')
 

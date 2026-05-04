@@ -13,6 +13,8 @@ from django.http import HttpResponseBadRequest
 
 from django.utils import timezone
 
+from django.core.paginator import Paginator
+
 @login_required
 def new_note(request, show_pk):
     """ Create a new note for a show. """
@@ -46,9 +48,13 @@ def new_note(request, show_pk):
 
 
 def latest_notes(request):
-    """ Get the 20 most recent notes, ordered with most recent first. """
-    notes = Note.objects.all().order_by('-posted_date')[:20]   # slice of the 20 most recent notes
-    return render(request, 'lmn/notes/note_list.html', {'notes': notes, 'title': 'Latest Notes'})
+    """ Get the 10 most recent notes, ordered with most recent first. """
+    notes = Note.objects.all().order_by('-posted_date')[:10]
+
+    return render(request, 'lmn/notes/note_list.html', {
+        'notes': notes,
+        'title': 'Latest Notes'
+        })
 
 
 def notes_for_show(request, show_pk): 
@@ -60,9 +66,14 @@ def notes_for_show(request, show_pk):
     if request.user.is_authenticated:
         user_note = Note.objects.filter(user=request.user, show=show).first()
 
+    paginator = Paginator(notes, 10)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
     return render(request, 'lmn/notes/notes_for_show.html', {
         'show': show,
-        'notes': notes,
+        'notes': page_obj,
+        'page_obj': page_obj,
         'user_note':user_note,
         'now':timezone.now(),
     })

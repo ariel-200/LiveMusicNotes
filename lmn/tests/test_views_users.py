@@ -173,7 +173,7 @@ class Logout(TestCase):
 
         self.assertNotContains(response, 'Edit')  # double-check 
 
-class TestUserNotesSearch():
+class TestUserNotesSearch(TestCase):
     fixtures = ['testing_users', 'testing_artists', 'testing_venues', 'testing_shows', 'testing_notes'] 
 
     # make sure search finds all matching notes
@@ -186,5 +186,6 @@ class TestUserNotesSearch():
         self.assertEqual(notes_expected, notes_provided)
 
     # search shows no notes
-
-    # search shows all notes
+    def test_user_notes_search_no_result_shows_no_shows(self):
+        response = self.client.get(reverse('user_profile', kwargs={'user_pk': 2}), {'search_text': 'STRINGTHATDOESNOTMATCHANYTHING'})
+        self.assertContains(response, 'No notes.')

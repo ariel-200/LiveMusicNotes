@@ -45,6 +45,19 @@ class TestNoteModel(TestCase):
         with self.assertRaises(ValidationError):
             note.full_clean()
 
+    def test_cannot_create_note_with_no_rating(self):
+        with self.assertRaises(IntegrityError):  # fails null constraint
+            Note.objects.create(show=self.show, user=self.user, title='test title', text='test text', posted_date=datetime.now())
+
+    def test_cannot_create_note_with_negative_rating(self):
+        with self.assertRaises(IntegrityError):  # db
+            Note.objects.create(show=self.show, user=self.user, title='test title', text='test text', posted_date=datetime.now(), rating=-1)
+
+    def test_cannot_create_note_with_more_than_five_rating(self):
+        with self.assertRaises(ValidationError):  # validation
+            Note.objects.create(show=self.show, user=self.user, title='test title', text='test text', posted_date=datetime.now(), rating=10)
+
+
 class TestShow(TestCase):
     # evaluate show creation conflicts
 

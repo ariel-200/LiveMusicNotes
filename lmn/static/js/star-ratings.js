@@ -10,6 +10,7 @@ function renderStars() {
             const emptyStars = '☆'.repeat(Math.max(0, maxStars - Math.floor(ratingValue)));
             
             el.textContent = filledStars + emptyStars;
+            el.style.fontSize = "18px";
             
             el.style.color = "#3452ae";  // match colorscheme
             //el.style.fontWeight = "bold";

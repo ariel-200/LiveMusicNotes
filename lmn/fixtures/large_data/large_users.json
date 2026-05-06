@@ -1,0 +1,112 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "username": "alice_concert_goer",
+      "first_name": "Alice",
+      "last_name": "User",
+      "email": "alice@example.com",
+      "password": "pbkdf2_sha256$123456$hash"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+      "username": "bob_music_fan",
+      "first_name": "Bob",
+      "last_name": "User",
+      "email": "bob@example.com",
+      "password": "pbkdf2_sha256$123456$hash"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 3,
+    "fields": {
+      "username": "charlie_notes",
+      "first_name": "Charlie",
+      "last_name": "User",
+      "email": "charlie@example.com",
+      "password": "pbkdf2_sha256$123456$hash"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 4,
+    "fields": {
+      "username": "dana_live",
+      "first_name": "Dana",
+      "last_name": "User",
+      "email": "dana@example.com",
+      "password": "pbkdf2_sha256$123456$hash"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 5,
+    "fields": {
+      "username": "eli_events",
+      "first_name": "Eli",
+      "last_name": "User",
+      "email": "eli@example.com",
+      "password": "pbkdf2_sha256$123456$hash"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 6,
+    "fields": {
+      "username": "frank_fan",
+      "first_name": "Frank",
+      "last_name": "User",
+      "email": "frank@example.com",
+      "password": "pbkdf2_sha256$123456$hash"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 7,
+    "fields": {
+      "username": "grace_grooves",
+      "first_name": "Grace",
+      "last_name": "User",
+      "email": "grace@example.com",
+      "password": "pbkdf2_sha256$123456$hash"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 8,
+    "fields": {
+      "username": "heidi_hear",
+      "first_name": "Heidi",
+      "last_name": "User",
+      "email": "heidi@example.com",
+      "password": "pbkdf2_sha256$123456$hash"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 9,
+    "fields": {
+      "username": "ivan_indie",
+      "first_name": "Ivan",
+      "last_name": "User",
+      "email": "ivan@example.com",
+      "password": "pbkdf2_sha256$123456$hash"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 10,
+    "fields": {
+      "username": "judy_jams",
+      "first_name": "Judy",
+      "last_name": "User",
+      "email": "judy@example.com",
+      "password": "pbkdf2_sha256$123456$hash"
+    }
+  }
+]

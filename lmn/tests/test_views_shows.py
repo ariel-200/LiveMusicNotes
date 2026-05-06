@@ -180,6 +180,8 @@ class TestCurrentTimeShowView(TestCase):
 
 class TestShowsTop(TestCase):
     """ Test shows ordered by most notes """
+    
+    fixtures = ['testing_users'], ['test_artists'], ['testing_venues'], ['testing_shows']
 
     def setUp(self):
         pass

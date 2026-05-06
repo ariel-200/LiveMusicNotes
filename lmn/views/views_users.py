@@ -17,19 +17,24 @@ def user_profile(request, user_pk):
 
     note_count = usernotes.count()
 
+    user_rating = None
+    next_rating = None
+    notes_until_next_rating = 0
 
     if note_count >= 5:
         user_rating= 'Super Fan'
-        next_rating = None
-        notes_until_next_level = 0
+
     elif note_count >= 2:
         user_rating = 'Active Reviewer'
         next_rating = 'Super Fan'
-        note_until_next_level = 5 - note_count
+        notes_until_next_rating = 5 - note_count
     elif note_count >= 1:
         user_rating = 'New Fan'
-        user_rating = 'Active Reviewer'
+        next_rating = 'Active Reviewer'
         notes_until_next_rating = 2 - note_count
+    else:
+        next_rating= 'New Fan'
+        notes_until_next_rating = 1
 
 
     # Get profile if it exists

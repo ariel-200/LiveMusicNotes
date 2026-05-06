@@ -45,12 +45,22 @@
             {% endif %}
         </div>
     {% endif %}
+<div class="profile-badge">
+
     {% if user_rating %}
-      <div class="profil-badge">
-          <p><strong>User Rating:</strong> {{user_rating}} </p>
-          <p><strong>Total Notes:</strong> {{note_count}} </p>
-      </div>
+    <p><strong>User Rating:</strong> {{user_rating}} </p>
+    {% else %}
+    <p><strong>User Rating:</strong> No rating yet </p>
     {% endif %}
+
+    <p><strong>Total Notes:</strong> {{ note_count}} </p>
+
+    {% if next_rating %}
+    <p>Post {{ notes_until_next_rating }} more notes to reach {{ next_rating}}.</p>
+    {% else %}
+    <p> You reached the highest rating!!</p>
+    {% endif %}
+      </div>
 
     <h2 id="username-notes">Notes</h2>
 

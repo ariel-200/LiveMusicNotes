@@ -3,8 +3,9 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
+from django.db.models import Q
 
-from ..forms import UserRegistrationForm, ProfileForm
+from ..forms import NoteSearchForm, UserRegistrationForm, ProfileForm
 from ..models import Note, Profile
 
 
@@ -12,12 +13,29 @@ def user_profile(request, user_pk):
     """ Get user profile for any user on the site. 
     Any user may view any other user's profile. 
     """
+    
     user = User.objects.get(pk=user_pk)
-    usernotes = Note.objects.filter(user=user.pk).order_by('-posted_date')
+
+    form = NoteSearchForm()
+    search_text = request.GET.get('search_text')  # template form
+    if search_text:
+
+        notes = Note.objects.filter(
+            Q(user=user.pk) &
+            (
+                Q(text__icontains=search_text) |
+                Q(title__icontains=search_text) |
+                Q(show__artist__name__icontains=search_text) |
+                Q(show__venue__name__icontains=search_text)
+            )
+        )
+    else:
+        notes = Note.objects.filter(user=user.pk).order_by('-posted_date')
 
     # Get profile if it exists
     profile = Profile.objects.filter(user=user).first()
-    return render(request, 'lmn/users/user_profile.html', {'user_profile': user, 'notes': usernotes, 'profile': profile})
+
+    return render(request, 'lmn/users/user_profile.html', {'user_profile': user, 'notes': notes , 'profile': profile, 'search_text': search_text, 'form': form})
 
 
 @login_required

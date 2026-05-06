@@ -17,13 +17,20 @@ def user_profile(request, user_pk):
 
     note_count = usernotes.count()
 
-    user_rating = None
+
     if note_count >= 5:
         user_rating= 'Super Fan'
+        next_rating = None
+        notes_until_next_level = 0
     elif note_count >= 2:
         user_rating = 'Active Reviewer'
+        next_rating = 'Super Fan'
+        note_until_next_level = 5 - note_count
     elif note_count >= 1:
-        user_rating = 'New Fan '
+        user_rating = 'New Fan'
+        user_rating = 'Active Reviewer'
+        notes_until_next_rating = 2 - note_count
+
 
     # Get profile if it exists
     profile = Profile.objects.filter(user=user).first()
@@ -31,8 +38,10 @@ def user_profile(request, user_pk):
         'user_profile': user,
         'notes': usernotes,
         'profile': profile,
-        'note_count':note_count,
-         'user_rating':user_rating,
+        'note_count': note_count,
+        'user_rating': user_rating,
+        'next_rating': next_rating,
+        'notes_until_next_rating': notes_until_next_rating,
     })
 
 

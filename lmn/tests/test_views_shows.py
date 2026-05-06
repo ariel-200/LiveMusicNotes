@@ -177,3 +177,15 @@ class TestCurrentTimeShowView(TestCase):
             # Show should be treated as a past show
             self.assertIn(self.current_show, past_shows)
             self.assertNotIn(self.current_show, upcoming_shows)
+
+class TestShowsTop(TestCase):
+    """ Test shows ordered by most notes """
+
+    def setUp(self):
+        pass
+
+    def test_shows_ordered_by_number_of_notes(self):
+        pass
+
+    def test_only_top_10_shows_by_number_of_notes_are_displayed(self):
+        pass

@@ -15,6 +15,16 @@ def user_profile(request, user_pk):
     user = User.objects.get(pk=user_pk)
     usernotes = Note.objects.filter(user=user.pk).order_by('-posted_date')
 
+    note_count = usernotes.count()
+
+    user_rating = None
+    if note_count >= 10:
+        user_rating= 'Super Fan'
+    elif note_count >= 5:
+        user_rating = 'Active Reviewer'
+    elif note_count >=1:
+        user_rating = 'Rising Reviewer'
+
     # Get profile if it exists
     profile = Profile.objects.filter(user=user).first()
     return render(request, 'lmn/users/user_profile.html', {'user_profile': user, 'notes': usernotes, 'profile': profile})

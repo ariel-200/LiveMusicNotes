@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.utils import timezone
+from django.db.models import Count
 
 from ..models import Show
 
@@ -15,3 +16,9 @@ def show_list(request):
         'past_shows': past_shows,
         'upcoming_shows': upcoming_shows
     })
+
+def shows_top(request):
+    """ Display shows ordered by notes descending """
+    shows = Show.objects.annotate(num_notes=Count('note')).order_by('-num_notes')
+
+    return render(request, 'lmn/shows/shows_top.html', {'shows': shows})

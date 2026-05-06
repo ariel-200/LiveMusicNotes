@@ -45,6 +45,12 @@
             {% endif %}
         </div>
     {% endif %}
+    {% if user_rating %}
+      <div class="profil-badge">
+          <p><strong>User Rating:</strong> {{user_rating}} </p>
+          <p><strong>Total Notes:</strong> {{note_count}} </p>
+      </div>
+    {% endif %}
 
     <h2 id="username-notes">Notes</h2>
 

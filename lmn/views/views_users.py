@@ -27,7 +27,13 @@ def user_profile(request, user_pk):
 
     # Get profile if it exists
     profile = Profile.objects.filter(user=user).first()
-    return render(request, 'lmn/users/user_profile.html', {'user_profile': user, 'notes': usernotes, 'profile': profile})
+    return render(request, 'lmn/users/user_profile.html', {
+        'user_profile': user,
+        'notes': usernotes,
+        'profile': profile,
+        'note_count':note_count,
+         'user_rating':user_rating,
+    })
 
 
 @login_required

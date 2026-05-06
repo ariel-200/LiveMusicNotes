@@ -183,11 +183,17 @@ class TestShowsTop(TestCase):
     
     fixtures = ['large_data/large_shows'], ['large_data/large_notes'], ['large_data/large_users'], ['large_data/large_venues'], ['large_data/large_artists']
 
-    def setUp(self):
-        pass
-
     def test_shows_ordered_by_number_of_notes(self):
-        pass
+        response = self.client.get(reverse('shows_top'))
+        shows_in_context_list = response.context['shows']
+
+        # check that the next show has greater or equal number of notes
+        # using this method instead because comparing ordered lists of shows would be redundant
+        for i in range(len(shows_in_context_list) - 1):
+            self.assertGreaterEqual(
+                shows_in_context_list[i].num_notes, 
+                shows_in_context_list[i+1].num_notes,
+            )
 
     def test_only_10_or_less_shows_are_displayed(self):
         """ Verify that only 10 or less shows are displayed """

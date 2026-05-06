@@ -18,12 +18,12 @@ def user_profile(request, user_pk):
     note_count = usernotes.count()
 
     user_rating = None
-    if note_count >= 10:
+    if note_count >= 5:
         user_rating= 'Super Fan'
-    elif note_count >= 5:
+    elif note_count >= 2:
         user_rating = 'Active Reviewer'
-    elif note_count >=1:
-        user_rating = 'Rising Reviewer'
+    elif note_count >= 1:
+        user_rating = 'New Fan '
 
     # Get profile if it exists
     profile = Profile.objects.filter(user=user).first()

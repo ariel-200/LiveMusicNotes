@@ -181,7 +181,7 @@ class TestCurrentTimeShowView(TestCase):
 class TestShowsTop(TestCase):
     """ Test shows ordered by most notes """
     
-    fixtures = ['testing_users'], ['test_artists'], ['testing_venues'], ['testing_shows']
+    fixtures = ['large_data/large_shows'], ['large_data/large_notes'], ['large_data/large_users'], ['large_data/large_venues'], ['large_data/large_artists']
 
     def setUp(self):
         pass
@@ -189,5 +189,10 @@ class TestShowsTop(TestCase):
     def test_shows_ordered_by_number_of_notes(self):
         pass
 
-    def test_only_top_10_shows_by_number_of_notes_are_displayed(self):
-        pass
+    def test_only_10_or_less_shows_are_displayed(self):
+        """ Verify that only 10 or less shows are displayed """
+
+        response = self.client.get(reverse('shows_top'))
+        shows_in_context = response.context['shows']
+
+        self.assertLessEqual(len(shows_in_context), 10)

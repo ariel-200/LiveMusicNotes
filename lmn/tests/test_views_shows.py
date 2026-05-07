@@ -275,7 +275,7 @@ class TestShowSearchView(TestCase):
 
         self.assertContains(response, self.artist_match_show.artist.name)
         self.assertContains(response, self.venue_match_show.venue.name)
-        self.assertNotContains(response, 'Random Artist at Random Venue')
+        self.assertNotContains(response, 'Other Artist at Other Venue')
 
     def test_search_ignores_extra_spaces(self):
         """ Verify search works with extra spaces around terms """

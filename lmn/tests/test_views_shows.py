@@ -195,10 +195,11 @@ class TestShowsTop(TestCase):
                 shows_in_context_list[i+1].num_notes,
             )
 
-    def test_only_10_or_less_shows_are_displayed(self):
-        """ Verify that only 10 or less shows are displayed """
+    def test_only_top_num_or_less_shows_are_displayed(self):
+        """ Verify that only specific amount decided or less shows are displayed """
 
         response = self.client.get(reverse('shows_top'))
         shows_in_context = response.context['shows']
+        num_shows_in_context = response.context['shows_top_count']
 
-        self.assertLessEqual(len(shows_in_context), 10)
+        self.assertLessEqual(len(shows_in_context), num_shows_in_context)

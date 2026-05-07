@@ -20,7 +20,8 @@ def show_list(request):
 def shows_top(request):
     """ Display shows ordered by notes descending """
 
-    # shows list ordered by number of notes, first 10
-    shows = Show.objects.annotate(num_notes=Count('note')).order_by('-num_notes')[:10]
+    # shows list ordered by number of notes; limit to certain number of top shows
+    shows_top_count = 10;
+    shows = Show.objects.annotate(num_notes=Count('note')).order_by('-num_notes')[:shows_top_count]
 
-    return render(request, 'lmn/shows/shows_top.html', {'shows': shows})
+    return render(request, 'lmn/shows/shows_top.html', {'shows': shows, 'shows_top_count': shows_top_count})

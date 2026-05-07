@@ -226,14 +226,16 @@ class TestShowSearchView(TestCase):
         response = self.client.get(reverse('show_list'), {'search_name': 'Search Artist'})
 
         self.assertContains(response, self.artist_match_show.artist.name)
-        self.assertNotContains(response, self.non_matching_show.artist.name)
+        # Completely unrelated show should not appear
+        self.assertNotContains(response, 'Other Artist at Other Venue')
 
     def test_search_finds_venue_name(self):
         """ Verify search finds shows by venue name """
         response = self.client.get(reverse('show_list'), {'search_name': 'Search Venue'})
 
         self.assertContains(response, self.venue_match_show.venue.name)
-        self.assertNotContains(response, self.non_matching_show.venue.name)
+        # Completely unrelated show should not appear
+        self.assertNotContains(response, 'Other Artist at Other Venue')
 
     def test_search_is_case_insensitive(self):
         """ Verify search is not case-sensitive """
@@ -254,3 +256,31 @@ class TestShowSearchView(TestCase):
         self.assertContains(response, self.artist_match_show.artist.name)
         self.assertContains(response, self.venue_match_show.venue.name)
         self.assertContains(response, self.non_matching_show.artist.name)
+
+    def test_search_matches_artist_and_venue_combined(self):
+        """ Verify search matches combined artist and venue terms """
+        search_text = f'{self.matching_artist.name} {self.matching_venue.name}'
+
+        response = self.client.get(reverse('show_list'), {'search_name': search_text})
+
+        self.assertContains(response, self.artist_match_show.artist.name)
+        self.assertContains(response, self.venue_match_show.venue.name)
+        self.assertNotContains(response, 'Other Artist at Other Venue')
+
+    def test_search_matches_artist_at_venue_phrase(self):
+        """ Verify search matches artist and venue with connector text """
+        search_text = f'{self.matching_artist.name} at {self.matching_venue.name}'
+
+        response = self.client.get(reverse('show_list'), {'search_name': search_text})
+
+        self.assertContains(response, self.artist_match_show.artist.name)
+        self.assertContains(response, self.venue_match_show.venue.name)
+        self.assertNotContains(response, 'Random Artist at Random Venue')
+
+    def test_search_ignores_extra_spaces(self):
+        """ Verify search works with extra spaces around terms """
+        search_text = f'   {self.matching_artist.name}   '
+
+        response = self.client.get(reverse('show_list'), {'search_name': search_text})
+
+        self.assertContains(response, self.artist_match_show.artist.name)

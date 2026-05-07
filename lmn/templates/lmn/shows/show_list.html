@@ -14,7 +14,7 @@
 
     <!-- Search form for Shows -->
     <form method="GET" action="{% url 'show_list' %}">
-        <label for="search_name">Search by artist name OR venue name:</label>
+        <label for="search_name">Search by artist name, venue name, or both:</label>
         <input type="text" id="search_name" name="search_name" value="{{ search_term|default_if_none:'' }}">
         <button type="submit">Search</button>
     </form>

@@ -18,18 +18,28 @@ def show_list(request):
     search_name = request.GET.get('search_name')
 
     if search_name:
-        # Filter shows by artist OR venue name (case-insensitive)
-        past_shows = Show.objects.filter(
-            Q(artist__name__icontains=search_name) |
-            Q(venue__name__icontains=search_name),
-            show_date__lte=now
-        ).order_by('-show_date')  # Most recent past shows first
+        ignored_words = ['at', 'the', 'an', 'a']
+        search_words = [
+            word for word in search_name.strip().split()
+            if word.lower() not in ignored_words
+        ]
 
-        upcoming_shows = Show.objects.filter(
-            Q(artist__name__icontains=search_name) |
-            Q(venue__name__icontains=search_name),
-            show_date__gt=now
-        ).order_by('show_date')  # Soonest upcoming shows first
+        # Most recent past shows first
+        past_shows = Show.objects.filter(show_date__lte=now).order_by('-show_date')
+        # Soonest upcoming shows first
+        upcoming_shows = Show.objects.filter(show_date__gt=now).order_by('show_date')
+
+        # Each word must match either the artist or venue name
+        for word in search_words:
+            past_shows = past_shows.filter(
+                Q(artist__name__icontains=word) |
+                Q(venue__name__icontains=word)
+            )
+
+            upcoming_shows = upcoming_shows.filter(
+                Q(artist__name__icontains=word) |
+                Q(venue__name__icontains=word)
+            )
 
     else:
         # No search term, show all shows

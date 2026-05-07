@@ -259,7 +259,7 @@ class TestShowSearchView(TestCase):
 
     def test_search_matches_artist_and_venue_combined(self):
         """ Verify search matches combined artist and venue terms """
-        search_text = f'{self.matching_artist.name} {self.matching_venue.name}'
+        search_text = f'{self.matching_artist.name} at {self.matching_venue.name}'
 
         response = self.client.get(reverse('show_list'), {'search_name': search_text})
 

@@ -51,14 +51,29 @@
       <h3>Latest Notes</h3>
 
       {% if latest_notes %}
-        <ul>
           {% for note in latest_notes %}
-            <li>
-              <a href="{% url 'note_detail' note.pk %}">{{ note.title }}</a>
-              for {{ note.show.artist.name }} at {{ note.show.venue.name }}
-            </li>
+              <div>
+                <h4>
+                    <a href="{% url 'note_detail' note.pk %}">{{ note.title }}</a>
+                </h4>
+
+                <p>
+                    The Show:
+                    <a href="{% url 'notes_for_show' show_pk=note.show.pk %}">
+                        {{ note.show.artist.name }} at {{ note.show.venue.name }} on {{ note.show.show_date }}
+                    </a>
+                </p>
+
+                <p>Posted on: {{ note.posted_date }}</p>
+
+                <p>
+                    Posted by:
+                    <a href="{% url 'user_profile' user_pk=note.user.pk %}">
+                        {{ note.user.username }}
+                    </a>
+                </p>
+              </div>
           {% endfor %}
-        </ul>
       {% else %}
         <p>No notes available.</p>
       {% endif %}

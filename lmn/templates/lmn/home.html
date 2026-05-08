@@ -72,6 +72,8 @@
                         {{ note.user.username }}
                     </a>
                 </p>
+
+                <p>{{ note.text|truncatechars:100 }}</p>
               </div>
           {% endfor %}
       {% else %}

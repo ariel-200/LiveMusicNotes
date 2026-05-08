@@ -70,24 +70,6 @@ class TestUserProfile(TestCase):
     def test_user_can_update_profile(self):
         """ Verify logged-in user can update profile info"""
         user = User.objects.get(pk=2)
-        self.client.force_login(user)
-
-        self.client.post(reverse('edit_profile'), {
-            'bio': 'I love music!',
-            'favorite_artist': 'Bob',
-            'favorite_genre': 'Pop',
-            'favorite_show': ''
-        })
-
-        profile = Profile.objects.get(user=user)
-
-        self.assertEqual(profile.bio, 'I love music!')
-        self.assertEqual(profile.favorite_artist, 'Bob')
-        self.assertEqual(profile.favorite_genre, 'Pop')
-
-    def test_user_can_update_favorite_show(self):
-        """ Verify logged-in user can update favorite show """
-        user = User.objects.get(pk=2)
         show = Show.objects.get(pk=1)
         self.client.force_login(user)
 
@@ -100,7 +82,33 @@ class TestUserProfile(TestCase):
 
         profile = Profile.objects.get(user=user)
 
+        self.assertEqual(profile.bio, 'I love music!')
+        self.assertEqual(profile.favorite_artist, 'Bob')
+        self.assertEqual(profile.favorite_genre, 'Pop')
         self.assertEqual(profile.favorite_show, show)
+
+    def test_user_can_clear_favorite_show(self):
+        """ Verify logged-in user can remove favorite show """
+        user = User.objects.get(pk=2)
+        show = Show.objects.get(pk=1)
+
+        Profile.objects.create(
+            user=user,
+            favorite_show=show
+        )
+
+        self.client.force_login(user)
+
+        self.client.post(reverse('edit_profile'), {
+            'bio': '',
+            'favorite_artist': '',
+            'favorite_genre': '',
+            'favorite_show': ''
+        })
+
+        profile = Profile.objects.get(user=user)
+
+        self.assertIsNone(profile.favorite_show)
 
     def test_user_profile_shows_favorite_show(self):
         """ Verify favorite show appears on user profile """

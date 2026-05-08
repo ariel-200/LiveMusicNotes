@@ -175,6 +175,67 @@ class TestNotes(TestCase):
         response = self.client.get(reverse('new_note', kwargs={'show_pk': show.pk}))
         self.assertTemplateUsed(response, 'lmn/notes/new_note.html')
 
+
+class TestNoteDetailView(TestCase):
+    """ Tests for the note detail page """
+
+    fixtures = ['testing_users', 'testing_artists', 'testing_venues', 'testing_shows', 'testing_notes']
+
+    def test_note_detail_page_loads(self):
+        """ Verify note detail page loads successfully """
+        response = self.client.get(reverse('note_detail', kwargs={'note_pk': 1}))
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_note_detail_uses_correct_template(self):
+        """ Verify note detail page uses correct template """
+        response = self.client.get(reverse('note_detail', kwargs={'note_pk': 1}))
+
+        self.assertTemplateUsed(response, 'lmn/notes/note_detail.html')
+
+    def test_note_detail_shows_show_information(self):
+        """ Verify show information appears on note detail page """
+        note = Note.objects.get(pk=1)
+        response = self.client.get(reverse('note_detail', kwargs={'note_pk': note.pk}))
+
+        self.assertContains(response, note.show.artist.name)
+        self.assertContains(response, note.show.venue.name)
+
+    def test_note_detail_shows_note_author(self):
+        """ Verify note author appears on note detail page """
+        note = Note.objects.get(pk=1)
+        response = self.client.get(reverse('note_detail', kwargs={'note_pk': note.pk}))
+
+        self.assertContains(response, note.user.username)
+
+    def test_note_detail_shows_note_title(self):
+        """ Verify note title appears on note detail page """
+        note = Note.objects.get(pk=1)
+        response = self.client.get(reverse('note_detail', kwargs={'note_pk': note.pk}))
+
+        self.assertContains(response, note.title)
+
+    def test_note_detail_shows_note_text(self):
+        """ Verify note text appears on note detail page """
+        note = Note.objects.get(pk=1)
+        response = self.client.get(reverse('note_detail', kwargs={'note_pk': note.pk}))
+
+        self.assertContains(response, note.text)
+
+    def test_note_detail_shows_note_rating(self):
+        """ Verify note rating appears on note detail page """
+        note = Note.objects.get(pk=1)
+        response = self.client.get(reverse('note_detail', kwargs={'note_pk': note.pk}))
+
+        self.assertContains(response, note.rating)
+
+    def test_note_detail_shows_404_for_missing_note(self):
+        """ Verify missing note detail page returns 404 """
+        response = self.client.get(reverse('note_detail', kwargs={'note_pk': 9999}))
+
+        self.assertEqual(response.status_code, 404)
+
+
 class TestFutureShowRestriction(TestCase):
     fixtures = ['testing_users', 'testing_artists', 'testing_venues']
 

@@ -85,7 +85,8 @@ class TestHomepageContent(TestCase):
                 show=show,
                 user=self.user,
                 title=f'Homepage Note {i}',
-                text='This is a homepage note.'
+                text='This is a homepage note.',
+                rating=3
             )
 
         response = self.client.get(reverse('homepage'))
@@ -119,12 +120,14 @@ class TestHomepageContent(TestCase):
             show=show,
             user=self.user,
             title='Homepage Note Title',
-            text='This note should appear on the homepage.'
+            text='This note should appear on the homepage.',
+            rating=4
         )
 
         response = self.client.get(reverse('homepage'))
 
         self.assertContains(response, note.title)
+        self.assertContains(response, note.rating)
         self.assertContains(response, note.text)
         self.assertContains(response, note.user.username)
 

@@ -64,14 +64,14 @@
                     </a>
                 </p>
 
-                <p>Posted on: {{ note.posted_date }}</p>
-
                 <p>
                     Posted by:
                     <a href="{% url 'user_profile' user_pk=note.user.pk %}">
                         {{ note.user.username }}
                     </a>
                 </p>
+
+                <p class="note-rating">{{ note.rating }}</p>
 
                 <p>{{ note.text|truncatechars:100 }}</p>
               </div>

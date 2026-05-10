@@ -46,7 +46,23 @@
         </div>
     {% endif %}
 
-    <h2 id="username-notes">Notes</h2>
+    <div>
+        <h2 id="username-notes">Notes</h2>
+        <p>Search {{ user_profile.username }}'s Notes (title/text):</p>
+        <form action="{% url 'user_profile' user_pk=user_profile.pk%}">
+            {{ form }}
+            <input type="submit" value="Search">
+        </form>
+    </div>
+
+    <div>
+        {% if search_text %}
+        <h3>
+            Notes matching '{{ search_text }}'
+            <a href="{% url 'user_profile' user_pk=user_profile.pk%}">(clear)</a>
+        </h3>
+        {% endif %}
+    </div>
 
   {% for note in notes %}
 
@@ -57,6 +73,7 @@
 
       <p class="note-info">{{ note.show.artist.name }} at {{ note.show.venue.name }} on {{ note.show.show_date }}</p>
       <p class="note-text">{{ note.text|truncatechars:300 }}</p>
+      <p class="note-rating">{{ note.rating }}</p>
       <p class="note-posted-at">{{ note.posted_date }}</p>
     </div>
 

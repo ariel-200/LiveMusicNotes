@@ -235,7 +235,7 @@ class TestNotesForShowPagination(TestCase):
         # Need 11 different users, one note per user per show
         for i in range(1, 12):
             user = User.objects.create_user(username=f'user{i:02d}', email=f'user{i:02d}@gmail.com', password='pass')
-            Note.objects.create(show=self.show, user=user, title=f'Note {i:02d}', text='text')
+            Note.objects.create(show=self.show, user=user, title=f'Note {i:02d}', text='text', rating=3)
 
     def test_first_page_shows_ten_notes(self):
         response = self.client.get(reverse('notes_for_show', kwargs={'show_pk': self.show.pk}))

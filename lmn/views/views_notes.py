@@ -5,10 +5,12 @@ from django.http import HttpResponseForbidden
 from django.core.exceptions import ValidationError
 
 import os
+import threading
 from django.conf import settings
 
-from ..models import Note, Show
+from ..models import Note, Show, SPAM_STATUS_SPAM
 from ..forms import NewNoteForm
+from ..services.spam_filter import check_note_spam
 
 from django.http import HttpResponseBadRequest
 
@@ -18,8 +20,6 @@ from django.utils import timezone
 def new_note(request, show_pk):
     """ Create a new note for a show. """
     show = get_object_or_404(Show, pk=show_pk)
-
-
     existing_note= Note.objects.filter(user=request.user, show=show).first()
 
     if existing_note:
@@ -28,8 +28,6 @@ def new_note(request, show_pk):
     #Prevent creating notes for future shows
     if show.show_date > timezone.now():
         return HttpResponseForbidden('You cannot add notes for future shows. ')
-
-
 
     if request.method == 'POST':
         form = NewNoteForm(request.POST, request.FILES)
@@ -40,6 +38,8 @@ def new_note(request, show_pk):
             try:
                 note.full_clean()
                 note.save()
+                thread = threading.Thread(target=check_note_spam, args=(note.pk,), daemon=True)
+                thread.start()
                 return redirect('note_detail', note_pk=note.pk)
             except ValidationError as e:
                 form.add_error(None, e)
@@ -51,14 +51,14 @@ def new_note(request, show_pk):
 
 def latest_notes(request):
     """ Get the 20 most recent notes, ordered with most recent first. """
-    notes = Note.objects.all().order_by('-posted_date')[:20]   # slice of the 20 most recent notes
+    notes = Note.objects.exclude(spam_status=SPAM_STATUS_SPAM).order_by('-posted_date')[:20]
     return render(request, 'lmn/notes/note_list.html', {'notes': notes, 'title': 'Latest Notes'})
 
 
 def notes_for_show(request, show_pk): 
     """ Get notes for one show, most recent first. """
     show = get_object_or_404(Show, pk=show_pk)  
-    notes = Note.objects.filter(show=show_pk).order_by('-posted_date')
+    notes = Note.objects.filter(show=show_pk).exclude(spam_status=SPAM_STATUS_SPAM).order_by('-posted_date')
 
     user_note = None
     if request.user.is_authenticated:

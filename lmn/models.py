@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
-from .services.spam_filter import is_spam
 
 # Remember that every model gets a primary key field by default.
 
@@ -76,9 +75,20 @@ class Show(models.Model):
         return f'Artist: {self.artist} At: {self.venue} From: {self.show_date} To: {self.end_date}'
 
 
+SPAM_STATUS_PENDING = 'PENDING'
+SPAM_STATUS_APPROVED = 'APPROVED'
+SPAM_STATUS_SPAM = 'SPAM'
+
+SPAM_STATUS_CHOICES = [
+    (SPAM_STATUS_PENDING, 'Pending'),
+    (SPAM_STATUS_APPROVED, 'Approved'),
+    (SPAM_STATUS_SPAM, 'Spam'),
+]
+
+
 class Note(models.Model):
     """ One User's opinion of one Show. """
-    
+
     show = models.ForeignKey(Show, blank=False, on_delete=models.CASCADE)
     user = models.ForeignKey('auth.User', blank=False, on_delete=models.CASCADE)
     title = models.CharField(max_length=200, blank=False)
@@ -91,6 +101,7 @@ class Note(models.Model):
             MaxValueValidator(5)
         ]
     )
+    spam_status = models.CharField(max_length=10, choices=SPAM_STATUS_CHOICES, default=SPAM_STATUS_PENDING)
 
     def clean(self):
         super().clean()
@@ -100,9 +111,6 @@ class Note(models.Model):
 
         if self.show and self.show.show_date > timezone.now():
             raise ValidationError('Cannot add notes for future shows.')
-        if is_spam(self.title or '', self.text or ''):
-            raise ValidationError("This note was flagged as spam and could not be saved.")
-
 
 
     def __str__(self):

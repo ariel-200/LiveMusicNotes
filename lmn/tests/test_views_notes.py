@@ -86,15 +86,15 @@ class TestAddNotesWhenUserLoggedIn(TestCase):
         # 2 test notes provided in fixture, should still be 2
         self.assertEqual(Note.objects.count(), initial_note_count)   
 
-    @patch('lmn.models.is_spam', return_value=False) #Patch to prevent LLM API call
-    def test_add_note_database_updated_correctly(self, mock_is_spam):
+    @patch('lmn.views.views_notes.check_note_spam')
+    def test_add_note_database_updated_correctly(self, mock_check_spam):
         initial_note_count = Note.objects.count()
 
         new_note_url = reverse('new_note', kwargs={'show_pk': self.new_show.pk})
 
         self.client.post(
             new_note_url,
-            {'text': 'I really enjoyed this concert', 'title': 'Great concert'},
+            {'text': 'I really enjoyed this concert', 'title': 'Great concert', 'rating': 4},
             follow=True)
 
         # Verify note is in database
@@ -104,24 +104,30 @@ class TestAddNotesWhenUserLoggedIn(TestCase):
         # And one more note in DB than before
         self.assertEqual(Note.objects.count(), initial_note_count + 1)
 
-        # Date correct? Should be the current date and time. 
+        # checks that the date is correct.
         now_timestamp = datetime.datetime.today().timestamp()
         posted_timestamp = new_note_query.first().posted_date.timestamp()
 
-        # Timestamps are to the nearest milisecond and it may take a few seconds
-        # to connect and write to the database. So if the test stores now_timestamp, 
-        # so the test's now_timestamp will probably be slightly different to the 
-        # time stored in the database. 
-        # So, we can assert that they are within a few seconds of each other.
         ten_seconds = 10 * 1000
-        self.assertAlmostEqual(now_timestamp, posted_timestamp, delta=ten_seconds) 
+        self.assertAlmostEqual(now_timestamp, posted_timestamp, delta=ten_seconds)
 
-    @patch('lmn.models.is_spam', return_value=False)
-    def test_redirect_to_note_detail_after_save(self, mock_is_spam):
+    @patch('lmn.views.views_notes.check_note_spam')
+    def test_new_note_has_pending_spam_status(self, mock_check_spam):
+        new_note_url = reverse('new_note', kwargs={'show_pk': self.new_show.pk})
+        self.client.post(
+            new_note_url,
+            {'text': 'I really enjoyed this concert', 'title': 'Great concert', 'rating': 4},
+            follow=True)
+
+        new_note = Note.objects.filter(show=self.new_show, title='Great concert').first()
+        self.assertEqual(new_note.spam_status, 'PENDING')
+
+    @patch('lmn.views.views_notes.check_note_spam')
+    def test_redirect_to_note_detail_after_save(self, mock_check_spam):
         new_note_url = reverse('new_note', kwargs={'show_pk': self.new_show.pk})
         response = self.client.post(
             new_note_url,
-            {'text': 'I really enjoyed this concert', 'title': 'Great concert'},
+            {'text': 'I really enjoyed this concert', 'title': 'Great concert', 'rating': 4},
             follow=True)
 
         new_note = Note.objects.filter(user=User.objects.first(), show=self.new_show, text='I really enjoyed this concert', title='Great concert').first()
@@ -139,7 +145,7 @@ class TestAddNotesWhenUserLoggedIn(TestCase):
 
 
 class TestNotes(TestCase):
-    fixtures = ['testing_users', 'testing_artists', 'testing_venues', 'testing_shows', 'testing_notes'] 
+    fixtures = ['testing_users', 'testing_artists', 'testing_venues', 'testing_shows', 'testing_notes']
 
     def test_latest_notes(self):
         response = self.client.get(reverse('latest_notes'))
@@ -149,6 +155,20 @@ class TestNotes(TestCase):
         self.assertEqual(first.pk, 3)
         self.assertEqual(second.pk, 2)
         self.assertEqual(third.pk, 1)
+
+    def test_spam_notes_excluded_from_latest_notes(self):
+        Note.objects.filter(pk=3).update(spam_status='SPAM')
+        response = self.client.get(reverse('latest_notes'))
+        note_pks = [n.pk for n in response.context['notes']]
+        self.assertNotIn(3, note_pks)
+
+    def test_spam_notes_excluded_from_notes_for_show(self):
+        # Show 1 has notes with pk=1 and pk=2; mark pk=2 as spam
+        Note.objects.filter(pk=2).update(spam_status='SPAM')
+        response = self.client.get(reverse('notes_for_show', kwargs={'show_pk': 1}))
+        note_pks = [n.pk for n in response.context['notes']]
+        self.assertNotIn(2, note_pks)
+        self.assertIn(1, note_pks)
 
     def test_notes_for_show_view(self):
         # Verify correct list of notes shown for a Show, most recent first

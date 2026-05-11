@@ -5,7 +5,7 @@ from django.contrib import auth
 from django.contrib.auth import authenticate
 
 from django.contrib.auth.models import User, AnonymousUser
-from lmn.models import Note, Profile
+from lmn.models import Note, Profile, Show
 
 
 class TestUserProfile(TestCase):
@@ -70,13 +70,14 @@ class TestUserProfile(TestCase):
     def test_user_can_update_profile(self):
         """ Verify logged-in user can update profile info"""
         user = User.objects.get(pk=2)
+        show = Show.objects.get(pk=1)
         self.client.force_login(user)
 
         self.client.post(reverse('edit_profile'), {
             'bio': 'I love music!',
             'favorite_artist': 'Bob',
             'favorite_genre': 'Pop',
-            'favorite_show': ''
+            'favorite_show': show.pk
         })
 
         profile = Profile.objects.get(user=user)
@@ -84,6 +85,71 @@ class TestUserProfile(TestCase):
         self.assertEqual(profile.bio, 'I love music!')
         self.assertEqual(profile.favorite_artist, 'Bob')
         self.assertEqual(profile.favorite_genre, 'Pop')
+        self.assertEqual(profile.favorite_show, show)
+
+    def test_user_can_clear_favorite_show(self):
+        """ Verify logged-in user can remove favorite show """
+        user = User.objects.get(pk=2)
+        show = Show.objects.get(pk=1)
+
+        Profile.objects.create(
+            user=user,
+            favorite_show=show
+        )
+
+        self.client.force_login(user)
+
+        self.client.post(reverse('edit_profile'), {
+            'bio': '',
+            'favorite_artist': '',
+            'favorite_genre': '',
+            'favorite_show': ''
+        })
+
+        profile = Profile.objects.get(user=user)
+
+        self.assertIsNone(profile.favorite_show)
+
+    def test_user_profile_shows_favorite_show(self):
+        """ Verify favorite show appears on user profile """
+        user = User.objects.get(pk=2)
+        show = Show.objects.get(pk=1)
+
+        Profile.objects.create(
+            user=user,
+            favorite_show=show
+        )
+
+        response = self.client.get(reverse('user_profile', kwargs={'user_pk': user.pk}))
+
+        self.assertContains(response, show.artist.name)
+        self.assertContains(response, show.venue.name)
+
+    def test_user_cannot_edit_another_users_profile(self):
+        """ Verify logged-in user cannot edit another user's profile """
+        logged_in_user = User.objects.get(pk=2)
+        other_user = User.objects.get(pk=1)
+        self.client.force_login(logged_in_user)
+
+        Profile.objects.create(
+            user=other_user,
+            bio='Original bio',
+            favorite_artist='Original artist',
+            favorite_genre='Original genre'
+        )
+
+        self.client.post(reverse('edit_profile'), {
+            'bio': 'Changed bio',
+            'favorite_artist': 'Changed artist',
+            'favorite_genre': 'Changed genre',
+            'favorite_show': ''
+        })
+
+        other_profile = Profile.objects.get(user=other_user)
+
+        self.assertEqual(other_profile.bio, 'Original bio')
+        self.assertEqual(other_profile.favorite_artist, 'Original artist')
+        self.assertEqual(other_profile.favorite_genre, 'Original genre')
 
     def test_edit_profile_link_only_on_own_profile(self):
         """ Verify edit profile link only appears on user's own profile """
@@ -172,3 +238,20 @@ class Logout(TestCase):
         response = self.client.get(reverse('user_profile', kwargs={'user_pk': 2}))
 
         self.assertNotContains(response, 'Edit')  # double-check 
+
+class TestUserNotesSearch(TestCase):
+    fixtures = ['testing_users', 'testing_artists', 'testing_venues', 'testing_shows', 'testing_notes'] 
+
+    # make sure search finds all matching notes
+    def test_user_profile_show_list_of_their_notes(self):
+        # get user profile for user 2. Should have 2 reviews for show 1 and 2.
+        response = self.client.get(reverse('user_profile', kwargs={'user_pk': 2}))
+        notes_expected = list(Note.objects.filter(user=2).order_by('-posted_date'))
+        notes_provided = list(response.context['notes'])
+        self.assertTemplateUsed('lmn/users/user_profile.html')
+        self.assertEqual(notes_expected, notes_provided)
+
+    # search shows no notes
+    def test_user_notes_search_no_result_shows_no_shows(self):
+        response = self.client.get(reverse('user_profile', kwargs={'user_pk': 2}), {'search_text': 'STRINGTHATDOESNOTMATCHANYTHING'})
+        self.assertContains(response, 'No notes.')

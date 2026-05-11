@@ -18,6 +18,7 @@
     <div class="nav-left">
         <a href="{% url 'venue_list' %}">Venues</a>
         <a href="{% url 'artist_list' %}">Artists</a>
+        <a href="{% url 'show_list' %}">Shows</a>
         <a href="{% url 'latest_notes' %}">Notes</a>
     </div>
 
@@ -46,6 +47,7 @@
     {% endblock %}
 
     <script src="{% static 'js/confirm-logout.js'%}"></script>
+    <script src="{% static 'js/star-ratings.js'%}"></script>
 
   </body>
 </html>

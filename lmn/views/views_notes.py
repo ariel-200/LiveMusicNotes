@@ -64,8 +64,12 @@ def notes_for_show(request, show_pk):
     if request.user.is_authenticated:
         user_note = Note.objects.filter(user=request.user, show=show).first()
 
-    return render(request, 'lmn/notes/notes_for_show.html', {'show': show, 'notes': notes, 'user_note':user_note, 'now': timezone.now()})
-
+    return render(request, 'lmn/notes/notes_for_show.html', {
+        'show': show,
+        'notes': notes,
+        'user_note':user_note,
+        'now':timezone.now(),
+    })
 
 def note_detail(request, note_pk):
     """ Display one note. """

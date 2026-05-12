@@ -1,3 +1,6 @@
+from datetime import timedelta
+from django.utils import timezone
+
 from django.test import TestCase
 
 from django.urls import reverse
@@ -164,6 +167,37 @@ class TestUserProfile(TestCase):
         # Viewing another user's profile, should NOT see Edit Profile
         response = self.client.get(reverse('user_profile', kwargs={'user_pk': 1}))
         self.assertNotContains(response, 'Edit Profile')
+
+    def test_user_with_no_notes_has_no_rating_yet(self):
+        response = self.client.get(reverse('user_profile', kwargs={'user_pk': 3}))
+        self.assertContains(response, 'No rating yet')
+
+    def test_user_with_two_notes_is_active_reviewer(self):
+        response = self.client.get(reverse('user_profile', kwargs={'user_pk': 2}))
+        self.assertContains(response, 'Active Reviewer')
+
+    def test_user_with_five_notes_is_super_fan(self):
+        user= User.objects.get(pk=3)
+
+        for number in range(5):
+           show = Show.objects.create(
+               artist_id=1,
+               venue_id=1,
+               show_date=timezone.now() - timedelta(days=number +1),
+               end_date=timezone.now() -timedelta(days=number +1) +timedelta(hours=1),
+
+            )
+           Note.objects.create(
+                user=user,
+                show=show,
+                title=f'Test {number}',
+                text='Test note',
+                rating=5,
+            )
+
+        response = self.client.get(reverse('user_profile', kwargs={'user_pk': 3}))
+        self.assertContains(response, 'Super Fan')
+
 
 
 class TestUserAuthentication(TestCase):

@@ -10,6 +10,21 @@
   <h2>Show List</h2>
   <p>Browse past and upcoming shows. Click a past show to read notes or add your own. <a href="{% url 'shows_top' %}">See shows with most notes</a></p>
 
+    <h3>Show Search</h3>
+
+    <!-- Search form for Shows -->
+    <form method="GET" action="{% url 'show_list' %}">
+        <label for="search_name">Search by artist name, venue name, or both:</label>
+        <input type="text" id="search_name" name="search_name" value="{{ search_term|default_if_none:'' }}">
+        <button type="submit">Search</button>
+    </form>
+
+    {% if search_term %}
+        <p>Shows matching '{{ search_term }}'
+            <a href="{% url 'show_list' %}">Clear search</a>
+        </p>
+    {% endif %}
+
   <!-- Past Shows Section -->
   <h3>Past Shows</h3>
 

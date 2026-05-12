@@ -4,18 +4,81 @@
 
   <!-- Homepage introducing the app and how to use it -->
 
-  <p>Welcome to Live Music Notes (LMN)</p>
+  <div>
+      <h2>Welcome to Live Music Notes</h2>
 
-  <p>
-    Browse artists, venues, and shows to explore live music events.
-  </p>
+      <p>
+        LMN helps you keep track of concerts you've attended and share your experiences through notes.
+      </p>
 
-  <p>
-    View notes from past shows or add your own to share your experience.
-  </p>
+      <p>
+          Use the navigation links above (Artists, Venues, Shows, and Notes) to explore the app.
+      </p>
+  </div>
 
-  <p>
-      Use the navigation links above (Artists, Venues, Shows, and Notes) to explore the app.
-  </p>
+    <!-- Instructions Section-->
+    <div>
+        <h3>How to Use</h3>
+
+        <ul>
+            <li>Browse Artists and Venues to explore music events</li>
+            <li>Visit the Shows page to find events you attended</li>
+            <li>Select a past show to view or add notes</li>
+        </ul>
+    </div>
+
+    <!-- Recent Shows Section-->
+    <div>
+        <h3>Recent Shows</h3>
+
+        {% if recent_shows %}
+        <ul>
+          {% for show in recent_shows %}
+            <li>
+              {{ show.artist.name }} at {{ show.venue.name }} ({{ show.show_date|date:"M d, Y" }})
+              -
+              <a href="{% url 'notes_for_show' show.pk %}">View Notes</a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No recent shows available.</p>
+      {% endif %}
+    </div>
+
+  <!-- Latest Notes Section -->
+  <div>
+      <h3>Latest Notes</h3>
+
+      {% if latest_notes %}
+          {% for note in latest_notes %}
+              <div>
+                <h4>
+                    <a href="{% url 'note_detail' note.pk %}">{{ note.title }}</a>
+                </h4>
+
+                <p>
+                    The Show:
+                    <a href="{% url 'notes_for_show' show_pk=note.show.pk %}">
+                        {{ note.show.artist.name }} at {{ note.show.venue.name }} on {{ note.show.show_date }}
+                    </a>
+                </p>
+
+                <p>
+                    Posted by:
+                    <a href="{% url 'user_profile' user_pk=note.user.pk %}">
+                        {{ note.user.username }}
+                    </a>
+                </p>
+
+                <p class="note-rating">{{ note.rating }}</p>
+
+                <p>{{ note.text|truncatechars:100 }}</p>
+              </div>
+          {% endfor %}
+      {% else %}
+        <p>No notes available.</p>
+      {% endif %}
+  </div>
 
 {% endblock %}

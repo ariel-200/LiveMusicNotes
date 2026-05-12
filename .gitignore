@@ -17,3 +17,5 @@ media/
 
 #ignore llm-related files
 .claude
+# ignore environment variables
+.env

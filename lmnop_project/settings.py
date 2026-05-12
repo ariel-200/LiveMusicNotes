@@ -11,10 +11,14 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# initialize env variable handling
+env = environ.Env()
+environ.Env.read_env(BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -99,6 +103,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# LLM API Key and Config
+
+GEMINI_API_KEY = env("GEMINI_API_KEY", default=None)
+GEMINI_MODEL = "gemini-2.5-flash"
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/

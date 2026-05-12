@@ -177,3 +177,135 @@ class TestCurrentTimeShowView(TestCase):
             # Show should be treated as a past show
             self.assertIn(self.current_show, past_shows)
             self.assertNotIn(self.current_show, upcoming_shows)
+
+class TestShowsTop(TestCase):
+    """ Test shows ordered by most notes """
+    
+    fixtures = ['large_data/large_shows'], ['large_data/large_notes'], ['large_data/large_users'], ['large_data/large_venues'], ['large_data/large_artists']
+
+    def test_shows_ordered_by_number_of_notes(self):
+        response = self.client.get(reverse('shows_top'))
+        shows_in_context_list = response.context['shows']
+
+        # check that the next show has greater or equal number of notes
+        # using this method instead because comparing ordered lists of shows would be redundant
+        for i in range(len(shows_in_context_list) - 1):
+            self.assertGreaterEqual(
+                shows_in_context_list[i].num_notes, 
+                shows_in_context_list[i+1].num_notes,
+            )
+
+    def test_only_top_num_or_less_shows_are_displayed(self):
+        """ Verify that only specific amount decided or less shows are displayed """
+
+        response = self.client.get(reverse('shows_top'))
+        shows_in_context = response.context['shows']
+        num_shows_in_context = response.context['shows_top_count']
+
+        self.assertLessEqual(len(shows_in_context), num_shows_in_context)
+
+class TestShowSearchView(TestCase):
+    """ Tests for shows page search functionality """
+
+    def setUp(self):
+        self.matching_artist = Artist.objects.create(name='Search Artist')
+        self.matching_venue = Venue.objects.create(
+            name='Search Venue',
+            city='Minneapolis',
+            state='MN'
+        )
+
+        self.other_artist = Artist.objects.create(name='Other Artist')
+        self.other_venue = Venue.objects.create(
+            name='Other Venue',
+            city='St Paul',
+            state='MN'
+        )
+
+        # Show that should match artist searches
+        self.artist_match_show = Show.objects.create(
+            artist=self.matching_artist,
+            venue=self.other_venue,
+            show_date=timezone.now() - timedelta(days=1),
+            end_date=timezone.now() - timedelta(days=1) + timedelta(hours=2)
+        )
+
+        # Show that should match venue searches
+        self.venue_match_show = Show.objects.create(
+            artist=self.other_artist,
+            venue=self.matching_venue,
+            show_date=timezone.now() - timedelta(days=1),
+            end_date=timezone.now() - timedelta(days=1) + timedelta(hours=2)
+        )
+
+        # Show that should not match search
+        self.non_matching_show = Show.objects.create(
+            artist=self.other_artist,
+            venue=self.other_venue,
+            show_date=timezone.now() - timedelta(days=2),
+            end_date=timezone.now() - timedelta(days=2) + timedelta(hours=2)
+        )
+
+    def test_search_finds_artist_name(self):
+        """ Verify search finds shows by artist name """
+        response = self.client.get(reverse('show_list'), {'search_name': 'Search Artist'})
+
+        self.assertContains(response, self.artist_match_show.artist.name)
+        # Completely unrelated show should not appear
+        self.assertNotContains(response, 'Other Artist at Other Venue')
+
+    def test_search_finds_venue_name(self):
+        """ Verify search finds shows by venue name """
+        response = self.client.get(reverse('show_list'), {'search_name': 'Search Venue'})
+
+        self.assertContains(response, self.venue_match_show.venue.name)
+        # Completely unrelated show should not appear
+        self.assertNotContains(response, 'Other Artist at Other Venue')
+
+    def test_search_is_case_insensitive(self):
+        """ Verify search is not case-sensitive """
+        response = self.client.get(reverse('show_list'), {'search_name': 'search artist'})
+
+        self.assertContains(response, self.artist_match_show.artist.name)
+
+    def test_search_term_is_sent_to_template(self):
+        """ Verify search term is available to the template """
+        response = self.client.get(reverse('show_list'), {'search_name': 'Search Artist'})
+
+        self.assertEqual(response.context['search_term'], 'Search Artist')
+
+    def test_empty_search_shows_all_results(self):
+        """ Verify empty search does not filter shows """
+        response = self.client.get(reverse('show_list'), {'search_name': ''})
+
+        self.assertContains(response, self.artist_match_show.artist.name)
+        self.assertContains(response, self.venue_match_show.venue.name)
+        self.assertContains(response, self.non_matching_show.artist.name)
+
+    def test_search_matches_artist_and_venue_combined(self):
+        """ Verify search matches combined artist and venue terms """
+        search_text = f'{self.matching_artist.name} at {self.matching_venue.name}'
+
+        response = self.client.get(reverse('show_list'), {'search_name': search_text})
+
+        self.assertContains(response, self.artist_match_show.artist.name)
+        self.assertContains(response, self.venue_match_show.venue.name)
+        self.assertNotContains(response, 'Other Artist at Other Venue')
+
+    def test_search_matches_artist_at_venue_phrase(self):
+        """ Verify search matches artist and venue with connector text """
+        search_text = f'{self.matching_artist.name} at {self.matching_venue.name}'
+
+        response = self.client.get(reverse('show_list'), {'search_name': search_text})
+
+        self.assertContains(response, self.artist_match_show.artist.name)
+        self.assertContains(response, self.venue_match_show.venue.name)
+        self.assertNotContains(response, 'Other Artist at Other Venue')
+
+    def test_search_ignores_extra_spaces(self):
+        """ Verify search works with extra spaces around terms """
+        search_text = f'   {self.matching_artist.name}   '
+
+        response = self.client.get(reverse('show_list'), {'search_name': search_text})
+
+        self.assertContains(response, self.artist_match_show.artist.name)

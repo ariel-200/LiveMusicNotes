@@ -9,7 +9,7 @@ from ..forms import NoteSearchForm, UserRegistrationForm, ProfileForm
 from ..models import Note, Profile
 
 
-def user_profile(request, user_pk):
+def user_profile(request, user_pk ):
     """ Get user profile for any user on the site. 
     Any user may view any other user's profile. 
     """
@@ -32,10 +32,44 @@ def user_profile(request, user_pk):
     else:
         notes = Note.objects.filter(user=user.pk).order_by('-posted_date')
 
+    note_count = Note.objects.filter(user=user.pk).count()
+
+    user_rating = None
+    next_rating = None
+    notes_until_next_rating = 0
+
+    if note_count >= 5:
+        user_rating= 'Super Fan'
+
+    elif note_count >= 2:
+        user_rating = 'Active Reviewer'
+        next_rating = 'Super Fan'
+        notes_until_next_rating = 5 - note_count
+    elif note_count >= 1:
+        user_rating = 'New Fan'
+        next_rating = 'Active Reviewer'
+        notes_until_next_rating = 2 - note_count
+    else:
+        next_rating= 'New Fan'
+        notes_until_next_rating = 1
+
+
     # Get profile if it exists
     profile = Profile.objects.filter(user=user).first()
 
-    return render(request, 'lmn/users/user_profile.html', {'user_profile': user, 'notes': notes , 'profile': profile, 'search_text': search_text, 'form': form})
+    return render(request, 'lmn/users/user_profile.html', {
+        'user_profile': user,
+        'notes': notes,
+        'profile': profile,
+        'search_text': search_text, 
+        'form': form,
+        'note_count': note_count,
+        'user_rating': user_rating,
+        'next_rating': next_rating,
+        'notes_until_next_rating': notes_until_next_rating,
+    })
+
+
 
 
 @login_required

@@ -19,6 +19,7 @@ urlpatterns = [
 
     # Show related URL
     path('shows/list/', views_shows.show_list, name='show_list'),
+    path('shows/top/', views_shows.shows_top, name='shows_top'),
 
     # Note related URLs
     path('notes/latest/', views_notes.latest_notes, name='latest_notes'),

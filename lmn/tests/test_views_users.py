@@ -1,3 +1,6 @@
+from datetime import timedelta
+from django.utils import timezone
+
 from django.test import TestCase
 
 from django.urls import reverse
@@ -5,7 +8,7 @@ from django.contrib import auth
 from django.contrib.auth import authenticate
 
 from django.contrib.auth.models import User, AnonymousUser
-from lmn.models import Note, Profile
+from lmn.models import Note, Profile, Show
 
 
 class TestUserProfile(TestCase):
@@ -70,13 +73,14 @@ class TestUserProfile(TestCase):
     def test_user_can_update_profile(self):
         """ Verify logged-in user can update profile info"""
         user = User.objects.get(pk=2)
+        show = Show.objects.get(pk=1)
         self.client.force_login(user)
 
         self.client.post(reverse('edit_profile'), {
             'bio': 'I love music!',
             'favorite_artist': 'Bob',
             'favorite_genre': 'Pop',
-            'favorite_show': ''
+            'favorite_show': show.pk
         })
 
         profile = Profile.objects.get(user=user)
@@ -84,6 +88,71 @@ class TestUserProfile(TestCase):
         self.assertEqual(profile.bio, 'I love music!')
         self.assertEqual(profile.favorite_artist, 'Bob')
         self.assertEqual(profile.favorite_genre, 'Pop')
+        self.assertEqual(profile.favorite_show, show)
+
+    def test_user_can_clear_favorite_show(self):
+        """ Verify logged-in user can remove favorite show """
+        user = User.objects.get(pk=2)
+        show = Show.objects.get(pk=1)
+
+        Profile.objects.create(
+            user=user,
+            favorite_show=show
+        )
+
+        self.client.force_login(user)
+
+        self.client.post(reverse('edit_profile'), {
+            'bio': '',
+            'favorite_artist': '',
+            'favorite_genre': '',
+            'favorite_show': ''
+        })
+
+        profile = Profile.objects.get(user=user)
+
+        self.assertIsNone(profile.favorite_show)
+
+    def test_user_profile_shows_favorite_show(self):
+        """ Verify favorite show appears on user profile """
+        user = User.objects.get(pk=2)
+        show = Show.objects.get(pk=1)
+
+        Profile.objects.create(
+            user=user,
+            favorite_show=show
+        )
+
+        response = self.client.get(reverse('user_profile', kwargs={'user_pk': user.pk}))
+
+        self.assertContains(response, show.artist.name)
+        self.assertContains(response, show.venue.name)
+
+    def test_user_cannot_edit_another_users_profile(self):
+        """ Verify logged-in user cannot edit another user's profile """
+        logged_in_user = User.objects.get(pk=2)
+        other_user = User.objects.get(pk=1)
+        self.client.force_login(logged_in_user)
+
+        Profile.objects.create(
+            user=other_user,
+            bio='Original bio',
+            favorite_artist='Original artist',
+            favorite_genre='Original genre'
+        )
+
+        self.client.post(reverse('edit_profile'), {
+            'bio': 'Changed bio',
+            'favorite_artist': 'Changed artist',
+            'favorite_genre': 'Changed genre',
+            'favorite_show': ''
+        })
+
+        other_profile = Profile.objects.get(user=other_user)
+
+        self.assertEqual(other_profile.bio, 'Original bio')
+        self.assertEqual(other_profile.favorite_artist, 'Original artist')
+        self.assertEqual(other_profile.favorite_genre, 'Original genre')
 
     def test_edit_profile_link_only_on_own_profile(self):
         """ Verify edit profile link only appears on user's own profile """
@@ -98,6 +167,37 @@ class TestUserProfile(TestCase):
         # Viewing another user's profile, should NOT see Edit Profile
         response = self.client.get(reverse('user_profile', kwargs={'user_pk': 1}))
         self.assertNotContains(response, 'Edit Profile')
+
+    def test_user_with_no_notes_has_no_rating_yet(self):
+        response = self.client.get(reverse('user_profile', kwargs={'user_pk': 3}))
+        self.assertContains(response, 'No rating yet')
+
+    def test_user_with_two_notes_is_active_reviewer(self):
+        response = self.client.get(reverse('user_profile', kwargs={'user_pk': 2}))
+        self.assertContains(response, 'Active Reviewer')
+
+    def test_user_with_five_notes_is_super_fan(self):
+        user= User.objects.get(pk=3)
+
+        for number in range(5):
+           show = Show.objects.create(
+               artist_id=1,
+               venue_id=1,
+               show_date=timezone.now() - timedelta(days=number +1),
+               end_date=timezone.now() -timedelta(days=number +1) +timedelta(hours=1),
+
+            )
+           Note.objects.create(
+                user=user,
+                show=show,
+                title=f'Test {number}',
+                text='Test note',
+                rating=5,
+            )
+
+        response = self.client.get(reverse('user_profile', kwargs={'user_pk': 3}))
+        self.assertContains(response, 'Super Fan')
+
 
 
 class TestUserAuthentication(TestCase):

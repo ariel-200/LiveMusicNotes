@@ -10,10 +10,12 @@ __pycache__
 
 # ignore virtual enviroments 
 venv
-env
+.env
 
 # ignore image uploads
 media/
 
+#ignore llm-related files
+.claude
 # ignore environment variables
 .env

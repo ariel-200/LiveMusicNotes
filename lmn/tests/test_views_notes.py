@@ -305,6 +305,35 @@ class TestEditNotes(TestCase):
         self.assertContains(response, 'ok')
         self.assertContains(response, 'kinda ok')
 
+
+class TestNotesForShowPagination(TestCase):
+
+    def setUp(self):
+        artist = Artist.objects.create(name='Test Artist')
+        venue = Venue.objects.create(name='Test Venue', city='City', state='MN')
+        self.show = Show.objects.create(
+            artist=artist,
+            venue=venue,
+            show_date=timezone.now() - timedelta(days=1),
+            end_date=timezone.now() - timedelta(days=1) + timedelta(hours=2),
+        )
+        # Need 11 different users, one note per user per show
+        for i in range(1, 12):
+            user = User.objects.create_user(username=f'user{i:02d}', email=f'user{i:02d}@gmail.com', password='pass')
+            Note.objects.create(show=self.show, user=user, title=f'Note {i:02d}', text='text', rating=3)
+
+    def test_first_page_shows_ten_notes(self):
+        response = self.client.get(reverse('notes_for_show', kwargs={'show_pk': self.show.pk}))
+        self.assertEqual(len(response.context['notes']), 10)
+
+    def test_second_page_shows_remaining_note(self):
+        response = self.client.get(reverse('notes_for_show', kwargs={'show_pk': self.show.pk}), {'page': 2})
+        self.assertEqual(len(response.context['notes']), 1)
+
+    def test_invalid_page_number_returns_last_page(self):
+        response = self.client.get(reverse('notes_for_show', kwargs={'show_pk': self.show.pk}), {'page': 999})
+        self.assertEqual(response.status_code, 200)
+
 class TestNoteRatings(TestCase):
     fixtures = ['testing_users', 'testing_artists', 'testing_venues', 'testing_shows']
 

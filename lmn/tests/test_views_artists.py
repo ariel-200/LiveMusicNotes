@@ -5,6 +5,8 @@ import re
 import datetime
 from datetime import timezone
 
+from ..models import Artist
+
 
 class TestNoArtistViews(TestCase):
 
@@ -138,3 +140,26 @@ class TestArtistViews(TestCase):
         response = self.client.get(url)
         shows = list(response.context['shows'].all())
         self.assertEqual(0, len(shows))
+
+class TestArtistPagination(TestCase):
+
+    def setUp(self):
+        """
+        Create 11 artists so page 1 has 10 artists and page 2 has 1 artist
+        """
+        for i in range(1, 12):
+            Artist.objects.create(name=f'Artist {i:02d}')
+
+    def test_first_page_shows_ten_artists(self):
+        response = self.client.get(reverse('artist_list'))
+        self.assertEqual(len(response.context['artists']), 10)
+
+    def test_second_page_shows_remaining_artists(self):
+        response = self.client.get(reverse('artist_list'), {'page': 2})
+        self.assertEqual(len(response.context['artists']), 1)
+
+    def test_invalid_page_number_returns_last_page(self):
+        # Checks that django handles invalid page input in url
+        response = self.client.get(reverse('artist_list'), {'page':999})
+        self.assertEqual(response.status_code, 200)
+

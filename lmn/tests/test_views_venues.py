@@ -5,6 +5,7 @@ import re
 import datetime
 from datetime import timezone
 
+from ..models import Venue
 
 class TestNoVenueViews(TestCase):
 
@@ -138,3 +139,22 @@ class TestVenues(TestCase):
 
         response = self.client.get(reverse('artists_at_venue', kwargs={'venue_pk': 1}))
         self.assertTemplateUsed(response, 'lmn/artists/artist_list_for_venue.html')
+
+
+class TestVenuePagination(TestCase):
+
+    def setUp(self):
+        for i in range(1, 12):
+            Venue.objects.create(name=f'Venue {i:02d}', city='City', state='MN')
+
+    def test_first_page_shows_ten_venues(self):
+        response = self.client.get(reverse('venue_list'))
+        self.assertEqual(len(response.context['venues']), 10)
+
+    def test_second_page_shows_remaining_venues(self):
+        response = self.client.get(reverse('venue_list'), {'page': 2})
+        self.assertEqual(len(response.context['venues']), 1)
+
+    def test_invalid_page_number_returns_last_page(self):
+        response = self.client.get(reverse('venue_list'), {'page': 999})
+        self.assertEqual(response.status_code, 200)

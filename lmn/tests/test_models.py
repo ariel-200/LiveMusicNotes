@@ -31,20 +31,32 @@ class TestNoteModel(TestCase):
         self.artist = Artist.objects.create(name='Test Artist')
         self.venue = Venue.objects.create( name='Test Venue', city='Minneapolis', state='MN')
         self.user = User.objects.create(username='testuser', email='test@example.com', first_name='Test', last_name='User')
-        self.show = Show.objects.create(artist=self.artist, venue=self.venue, show_date=timezone.now() - timedelta(days=1),
-                                        end_date=timezone.now() - timedelta(days=1) + timedelta(hours=1))
+        self.show = Show.objects.create(artist=self.artist, venue=self.venue, show_date=timezone.now() - timedelta(days=1), end_date=timezone.now() - timedelta(days=1) + timedelta(hours=1))
 
     def test_user_cannot_create_two_notes_for_same_show(self):
-        Note.objects.create(show=self.show, user=self.user, title='first', text='first note')
+        Note.objects.create(show=self.show, user=self.user, title='first', text='first note', rating=1)
 
         with self.assertRaises(IntegrityError):
-           Note.objects.create(show=self.show, user=self.user, title='second', text='second note')
+           Note.objects.create(show=self.show, user=self.user, title='second', text='second note', rating=1)
 
     def test_cannot_create_note_for_future_show(self):
         show = Show.objects.create(artist=self.artist, venue=self.venue, show_date=timezone.now() + timedelta(days=5), end_date=timezone.now() + timedelta(days=5, hours=2))
         note = Note(show=show,user=self.user, title='test title', text='test text')
         with self.assertRaises(ValidationError):
             note.full_clean()
+
+    def test_cannot_create_note_with_no_rating(self):
+        with self.assertRaises(IntegrityError):  # fails null constraint
+            Note.objects.create(show=self.show, user=self.user, title='test title', text='test text', posted_date=datetime.now())
+
+    def test_cannot_create_note_with_negative_rating(self):
+        with self.assertRaises(IntegrityError):  # db
+            Note.objects.create(show=self.show, user=self.user, title='test title', text='test text', posted_date=datetime.now(), rating=-1)
+
+    def test_cannot_create_note_with_more_than_five_rating(self):
+        with self.assertRaises(ValidationError):  # validation
+            Note.objects.create(show=self.show, user=self.user, title='test title', text='test text', posted_date=datetime.now(), rating=10)
+
 
 class TestShow(TestCase):
     # evaluate show creation conflicts

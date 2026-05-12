@@ -11,8 +11,8 @@ import datetime
 from datetime import timedelta
 from django.utils import timezone
 
-from lmn.models import  Show
-
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 
 class TestNoNotesViews(TestCase):
 
@@ -55,8 +55,7 @@ class TestAddNotesWhenUserLoggedIn(TestCase):
         user = User.objects.first()
         self.client.force_login(user)
 
-        self.new_show = Show.objects.create( artist_id=1, venue_id=1, show_date=timezone.now() -timedelta(days=1),
-                                             end_date=timezone.now() - timedelta(days=1) + timedelta(hours=1))
+        self.new_show = Show.objects.create( artist_id=1, venue_id=1, show_date=timezone.now() -timedelta(days=1), end_date=timezone.now() - timedelta(days=1) + timedelta(hours=1))
 
     def test_save_note_for_non_existent_show_is_error(self):
         new_note_url = reverse('new_note', kwargs={'show_pk': 10000})
@@ -92,7 +91,7 @@ class TestAddNotesWhenUserLoggedIn(TestCase):
 
         self.client.post(
             new_note_url, 
-            {'text': 'ok', 'title': 'blah blah'}, 
+            {'text': 'ok', 'title': 'blah blah', 'rating': 1}, 
             follow=True)
 
         # Verify note is in database
@@ -118,7 +117,7 @@ class TestAddNotesWhenUserLoggedIn(TestCase):
         new_note_url = reverse('new_note', kwargs={'show_pk': self.new_show.pk})
         response = self.client.post(
             new_note_url, 
-            {'text': 'ok', 'title': 'blah blah'}, 
+            {'text': 'ok', 'title': 'blah blah', 'rating': 1}, 
             follow=True)
 
         new_note = Note.objects.filter(user=User.objects.first(), show=self.new_show, text='ok', title='blah blah').first()
@@ -126,7 +125,7 @@ class TestAddNotesWhenUserLoggedIn(TestCase):
         self.assertRedirects(response, reverse('note_detail', kwargs={'note_pk': new_note.pk}))
 
     def test_user_cannot_add_second_note_for_same_show(self):
-     Note.objects.create(show=self.new_show, user=User.objects.first(), title='first', text='first note')
+     Note.objects.create(show=self.new_show, user=User.objects.first(), title='first', text='first note', rating=1)
 
      response = self.client.post(
             reverse('new_note', kwargs={'show_pk': self.new_show.pk}), {'title': 'second', 'text': 'second note'})
@@ -172,10 +171,70 @@ class TestNotes(TestCase):
         # Log someone in, add note
         self.client.force_login(User.objects.first())
 
-        show = Show.objects.create(artist_id=1,venue_id=1,show_date=timezone.now() - timedelta(days=1),
-                                   end_date=timezone.now() - timedelta(days=1) + timedelta(hours=1))
+        show = Show.objects.create(artist_id=1,venue_id=1,show_date=timezone.now() - timedelta(days=1), end_date=timezone.now() - timedelta(days=1) + timedelta(hours=1))
         response = self.client.get(reverse('new_note', kwargs={'show_pk': show.pk}))
         self.assertTemplateUsed(response, 'lmn/notes/new_note.html')
+
+
+class TestNoteDetailView(TestCase):
+    """ Tests for the note detail page """
+
+    fixtures = ['testing_users', 'testing_artists', 'testing_venues', 'testing_shows', 'testing_notes']
+
+    def test_note_detail_page_loads(self):
+        """ Verify note detail page loads successfully """
+        response = self.client.get(reverse('note_detail', kwargs={'note_pk': 1}))
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_note_detail_uses_correct_template(self):
+        """ Verify note detail page uses correct template """
+        response = self.client.get(reverse('note_detail', kwargs={'note_pk': 1}))
+
+        self.assertTemplateUsed(response, 'lmn/notes/note_detail.html')
+
+    def test_note_detail_shows_show_information(self):
+        """ Verify show information appears on note detail page """
+        note = Note.objects.get(pk=1)
+        response = self.client.get(reverse('note_detail', kwargs={'note_pk': note.pk}))
+
+        self.assertContains(response, note.show.artist.name)
+        self.assertContains(response, note.show.venue.name)
+
+    def test_note_detail_shows_note_author(self):
+        """ Verify note author appears on note detail page """
+        note = Note.objects.get(pk=1)
+        response = self.client.get(reverse('note_detail', kwargs={'note_pk': note.pk}))
+
+        self.assertContains(response, note.user.username)
+
+    def test_note_detail_shows_note_title(self):
+        """ Verify note title appears on note detail page """
+        note = Note.objects.get(pk=1)
+        response = self.client.get(reverse('note_detail', kwargs={'note_pk': note.pk}))
+
+        self.assertContains(response, note.title)
+
+    def test_note_detail_shows_note_text(self):
+        """ Verify note text appears on note detail page """
+        note = Note.objects.get(pk=1)
+        response = self.client.get(reverse('note_detail', kwargs={'note_pk': note.pk}))
+
+        self.assertContains(response, note.text)
+
+    def test_note_detail_shows_note_rating(self):
+        """ Verify note rating appears on note detail page """
+        note = Note.objects.get(pk=1)
+        response = self.client.get(reverse('note_detail', kwargs={'note_pk': note.pk}))
+
+        self.assertContains(response, note.rating)
+
+    def test_note_detail_shows_404_for_missing_note(self):
+        """ Verify missing note detail page returns 404 """
+        response = self.client.get(reverse('note_detail', kwargs={'note_pk': 9999}))
+
+        self.assertEqual(response.status_code, 404)
+
 
 class TestFutureShowRestriction(TestCase):
     fixtures = ['testing_users', 'testing_artists', 'testing_venues']
@@ -222,3 +281,29 @@ class TestEditNotes(TestCase):
         self.assertContains(response, 'ok')
         self.assertContains(response, 'kinda ok')
 
+class TestNoteRatings(TestCase):
+    fixtures = ['testing_users', 'testing_artists', 'testing_venues', 'testing_shows']
+
+    def setUp(self):
+        self.client.force_login(User.objects.first())
+
+    def test_note_rated_less_than_zero_fails(self):
+        """
+        Note rating should not be below zero
+        """
+        with self.assertRaises(IntegrityError):  # db constraint?
+            Note.objects.create(show_id=1, user=User.objects.first(), title='', text='', rating=-1)
+
+    def test_note_rated_higher_than_five_fails(self):
+        """
+        Note rating should not be above 5 stars
+        """
+        with self.assertRaises(ValidationError):
+            Note.objects.create(show_id=1, user=User.objects.first(), title='example title', text='example text', rating=6)
+
+    def test_note_rated_null_fails(self):
+        """
+        Note rating cannot be empty
+        """
+        with self.assertRaises(IntegrityError):  # db constraint
+            Note.objects.create(show_id=1, user=User.objects.first(), title='', text='')

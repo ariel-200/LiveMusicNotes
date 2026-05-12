@@ -12,7 +12,9 @@
 
   <body>
 
-    <h1>LMN</h1>
+    <h1>
+        <a href="{% url 'homepage' %}">LMN</a>
+    </h1>
 
     <div class="nav-bar">
     <div class="nav-left">
@@ -47,6 +49,7 @@
     {% endblock %}
 
     <script src="{% static 'js/confirm-logout.js'%}"></script>
+    <script src="{% static 'js/star-ratings.js'%}"></script>
 
   </body>
 </html>

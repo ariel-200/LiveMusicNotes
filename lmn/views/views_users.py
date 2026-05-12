@@ -32,7 +32,7 @@ def user_profile(request, user_pk ):
     else:
         notes = Note.objects.filter(user=user.pk).order_by('-posted_date')
 
-    note_count = notes.count()
+    note_count =  Note.objects.filter(user=user.pk).count()
 
     user_rating = None
     next_rating = None

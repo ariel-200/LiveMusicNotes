@@ -178,6 +178,31 @@ class TestCurrentTimeShowView(TestCase):
             self.assertIn(self.current_show, past_shows)
             self.assertNotIn(self.current_show, upcoming_shows)
 
+class TestShowsTop(TestCase):
+    """ Test shows ordered by most notes """
+    
+    fixtures = ['large_data/large_shows'], ['large_data/large_notes'], ['large_data/large_users'], ['large_data/large_venues'], ['large_data/large_artists']
+
+    def test_shows_ordered_by_number_of_notes(self):
+        response = self.client.get(reverse('shows_top'))
+        shows_in_context_list = response.context['shows']
+
+        # check that the next show has greater or equal number of notes
+        # using this method instead because comparing ordered lists of shows would be redundant
+        for i in range(len(shows_in_context_list) - 1):
+            self.assertGreaterEqual(
+                shows_in_context_list[i].num_notes, 
+                shows_in_context_list[i+1].num_notes,
+            )
+
+    def test_only_top_num_or_less_shows_are_displayed(self):
+        """ Verify that only specific amount decided or less shows are displayed """
+
+        response = self.client.get(reverse('shows_top'))
+        shows_in_context = response.context['shows']
+        num_shows_in_context = response.context['shows_top_count']
+
+        self.assertLessEqual(len(shows_in_context), num_shows_in_context)
 
 class TestShowSearchView(TestCase):
     """ Tests for shows page search functionality """

@@ -1,0 +1,22 @@
+{% extends 'lmn/base.html' %}
+
+{% block content %}
+
+<h3>Top {{ shows_top_count }} Shows by Notes</h3>
+    <p>
+        <a href="{% url 'show_list' %}">Back to list of all shows</a>
+    </p>
+
+        {% for show in shows %}
+            <div class="show">
+                <p>
+                    <a href="{% url 'notes_for_show' show_pk=show.pk%}">
+                        {{ show.artist.name }} at {{ show.venue.name }} on {{ show.show_date }} ({{ show.num_notes }} notes)
+                    </a>
+                </p>
+            </div>
+        {% empty %}
+            <p>No shows found.</p>
+    {% endfor %}
+
+{% endblock %}

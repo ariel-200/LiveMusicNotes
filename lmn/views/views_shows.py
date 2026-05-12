@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.utils import timezone
+from django.db.models import Count
 from django.db.models import Q
 
 from ..models import Show
@@ -51,3 +52,12 @@ def show_list(request):
         'upcoming_shows': upcoming_shows,
         'search_term': search_name
     })
+
+def shows_top(request):
+    """ Display shows ordered by notes descending """
+
+    # shows list ordered by number of notes; limit to certain number of top shows
+    shows_top_count = 10;
+    shows = Show.objects.annotate(num_notes=Count('note')).order_by('-num_notes')[:shows_top_count]
+
+    return render(request, 'lmn/shows/shows_top.html', {'shows': shows, 'shows_top_count': shows_top_count})

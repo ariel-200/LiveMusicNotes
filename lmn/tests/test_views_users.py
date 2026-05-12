@@ -192,6 +192,7 @@ class TestUserProfile(TestCase):
                 show=show,
                 title=f'Test {number}',
                 text='Test note',
+                rating=5,
             )
 
         response = self.client.get(reverse('user_profile', kwargs={'user_pk': 3}))

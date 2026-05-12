@@ -75,9 +75,20 @@ class Show(models.Model):
         return f'Artist: {self.artist} At: {self.venue} From: {self.show_date} To: {self.end_date}'
 
 
+SPAM_STATUS_PENDING = 'PENDING'
+SPAM_STATUS_APPROVED = 'APPROVED'
+SPAM_STATUS_SPAM = 'SPAM'
+
+SPAM_STATUS_CHOICES = [
+    (SPAM_STATUS_PENDING, 'Pending'),
+    (SPAM_STATUS_APPROVED, 'Approved'),
+    (SPAM_STATUS_SPAM, 'Spam'),
+]
+
+
 class Note(models.Model):
     """ One User's opinion of one Show. """
-    
+
     show = models.ForeignKey(Show, blank=False, on_delete=models.CASCADE)
     user = models.ForeignKey('auth.User', blank=False, on_delete=models.CASCADE)
     title = models.CharField(max_length=200, blank=False)
@@ -90,6 +101,7 @@ class Note(models.Model):
             MaxValueValidator(5)
         ]
     )
+    spam_status = models.CharField(max_length=10, choices=SPAM_STATUS_CHOICES, default=SPAM_STATUS_PENDING)
 
     def clean(self):
         super().clean()
@@ -99,7 +111,6 @@ class Note(models.Model):
 
         if self.show and self.show.show_date > timezone.now():
             raise ValidationError('Cannot add notes for future shows.')
-
 
 
     def __str__(self):
@@ -123,7 +134,6 @@ class Note(models.Model):
             super().save(*args, **kwargs)
         
         self.full_clean()
-
 
 
 class Profile(models.Model):
